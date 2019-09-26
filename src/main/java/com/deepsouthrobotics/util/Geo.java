@@ -1,6 +1,6 @@
-package org.deepsouthrobotics.util;
+package com.deepsouthrobotics.util;
 
-import org.deepsouthrobotics.data.GPSPosition;
+import com.deepsouthrobotics.data.GPSPosition;
 
 /**
 |--------------------------------------------------------------------------

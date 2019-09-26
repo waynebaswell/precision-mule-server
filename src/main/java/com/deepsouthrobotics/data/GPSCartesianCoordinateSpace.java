@@ -1,6 +1,6 @@
-package org.deepsouthrobotics.data;
+package com.deepsouthrobotics.data;
 
-import org.deepsouthrobotics.util.Geo;
+import com.deepsouthrobotics.util.Geo;
 
 /**
 |--------------------------------------------------------------------------
@@ -20,19 +20,21 @@ public class GPSCartesianCoordinateSpace
 	 * Pass 1 position's representation as GPS and Cartesian to the constructor -- from this we'll get GPS position's Lat/Long center
 	 * and we'll be able to convert future cartesian X Y offsets to GPSPosition
 	 */
-	public GPSCartesianCoordinateSpace(GPSPosition positionAsGPSPosition, CartesianPosition positionAsCartesianPosition)
+	public GPSCartesianCoordinateSpace(GPSPosition gpsPosition)
 	{
-		Double distanceFromZeroX = positionAsCartesianPosition.x;
-		Double distanceFromZeroY = positionAsCartesianPosition.y;
+		Double distanceFromZeroX = gpsPosition.x;
+		Double distanceFromZeroY = gpsPosition.y;
 		
 		Geo geo = new Geo();
-		center = geo.offset(positionAsGPSPosition, -distanceFromZeroX, -distanceFromZeroY);
+		center = geo.offset(gpsPosition, -distanceFromZeroX, -distanceFromZeroY);
 	}
 	
 	public GPSPosition gpsPositionGivenDistanceFromZeroZero(double x, double y)
 	{
 		Geo geo = new Geo();
 		GPSPosition g = geo.offset(center, x, y);
+		g.x = x;
+		g.y = y;
 		return g;
 	}
 }

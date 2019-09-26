@@ -6,9 +6,71 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4ebd860c-fda2-4371-bd95-20e7bd2b0f63" name="Default Changelist" comment="" />
-    <ignored path="$PROJECT_DIR$/out/" />
-    <ignored path="$PROJECT_DIR$/target/" />
+    <list default="true" id="4ebd860c-fda2-4371-bd95-20e7bd2b0f63" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/android_maps_utils_purejava_1_0_SNAPSHOT_jar_with_dependencies.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/api/BuildMissionFromLatLngPoints.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/data/GPSPosition.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/api/BuildMissionFromLatLngPoints.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/brain/MissionBrain.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/CartesianPosition.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/data/CartesianPosition.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/data/Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/data/Constants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/GPSCartesianCoordinateSpace.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/data/GPSCartesianCoordinateSpace.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/GPSPosition.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Position.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/data/Position.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/PositionType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/data/PositionType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/filter/CORSFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/filter/CORSFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/util/Geo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/util/Geo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/deepsouthrobotics/api/BuildMissionFromLatLngPoints.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/deepsouthrobotics/brain/MissionBrain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/deepsouthrobotics/data/CartesianPosition.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/deepsouthrobotics/data/Config.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/deepsouthrobotics/data/Constants.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/deepsouthrobotics/data/GPSCartesianCoordinateSpace.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/deepsouthrobotics/data/GPSPosition.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/deepsouthrobotics/data/Position.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/deepsouthrobotics/data/PositionType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/deepsouthrobotics/filter/CORSFilter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/org/deepsouthrobotics/util/Geo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder.war" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/META-INF/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/META-INF/missionbuilder.kotlin_module" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/api/BuildMissionFromLatLngPoints.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/api/MyResource.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/brain/MissionBrain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/data/CartesianPosition.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/data/Config.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/data/Constants.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/data/GPSCartesianCoordinateSpace.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/data/GPSPosition.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/data/Position.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/data/PositionType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/filter/CORSFilter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/classes/org/deepsouthrobotics/util/Geo.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/aopalliance-repackaged-2.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/hk2-api-2.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/hk2-locator-2.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/hk2-utils-2.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/jakarta.annotation-api-1.3.4.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/jakarta.inject-2.5.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/jakarta.ws.rs-api-2.1.5.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/javassist-3.22.0-CR2.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/jersey-client-2.28.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/jersey-common-2.28.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/jersey-container-servlet-core-2.28.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/jersey-hk2-2.28.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/jersey-media-jaxb-2.28.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/jersey-server-2.28.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/json-20180813.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/osgi-resource-locator-1.0.1.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/lib/validation-api-2.0.1.Final.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/WEB-INF/web.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/missionbuilder/index.jsp" beforeDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,96 +80,22 @@
   <component name="CodeInsightWorkspaceSettings">
     <option name="optimizeImportsOnTheFly" value="true" />
   </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
   <component name="DefaultGradleProjectSettings">
     <option name="isMigrated" value="true" />
-  </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Config.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="13" column="79" selection-start-line="13" selection-start-column="79" selection-end-line="13" selection-end-column="79" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Position.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" column="55" selection-start-line="6" selection-start-column="55" selection-end-line="6" selection-end-column="55" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/GPSCartesianCoordinateSpace.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" selection-start-line="4" selection-end-line="13" selection-end-column="2" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Constants.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" selection-start-line="10" selection-end-line="10" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/GPSPosition.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" column="5" selection-start-line="6" selection-start-column="5" selection-end-line="6" selection-end-column="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/PositionType.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="12" column="26" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/util/Geo.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" column="1" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/filter/CORSFilter.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="18" selection-start-line="18" selection-end-line="18" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/CartesianPosition.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="24" column="35" selection-start-line="24" selection-start-column="35" selection-end-line="24" selection-end-column="35" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -116,48 +104,8 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>my</find>
-      <find>MyResource`</find>
-      <find>parseMissionPlanRecordingFileToStringArray</find>
-      <find>SEPERATOR</find>
-      <find>MISSION_BUILDING_SERVICE_URI</find>
-      <find>E</find>
-      <find>main</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>SEPARATOR</replace>
-    </replaceStrings>
-    <dirStrings>
-      <dir>$PROJECT_DIR$</dir>
-    </dirStrings>
-  </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/BuildMissionFromLatLngPoints.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/MyResource.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/server/BuildMissionFromLatLngPoints.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/MissionPlanRecording.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/MissionSurgeon.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/brain/MissionSurgeon.java" />
-        <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/main/webapp/index.jsp" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/CartesianPosition.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Config.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/GPSCartesianCoordinateSpace.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Constants.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/PositionType.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/util/Geo.java" />
-        <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/api/BuildMissionFromLatLngPoints.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/brain/MissionBrain.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/GPSPosition.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Position.java" />
-        <option value="$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/filter/CORSFilter.java" />
-      </list>
-    </option>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="LogFilters">
     <option name="FILTER_ERRORS" value="false" />
@@ -173,32 +121,25 @@
       </MavenImportingSettings>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
-    <option name="x" value="34" />
-    <option name="y" value="23" />
-    <option name="width" value="1406" />
-    <option name="height" value="877" />
-  </component>
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="PackagesPane" />
-      <pane id="ProjectPane" />
-      <pane id="Scope" />
-    </panes>
-  </component>
+  <component name="ProjectId" id="1QdkbAVqBWewVkLgaq93lq8aAZP" />
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="ignore_missing_gitignore" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="/usr/local/bin/node" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.4189189" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.import" />
     <property name="typescript.add.unambiguous.imports.on.the.fly" value="true" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lib" />
+    </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="org.deepsouthrobotics.util" />
     </key>
@@ -330,6 +271,16 @@
       </method>
     </configuration>
   </component>
+  <component name="ServiceViewManager">
+    <option name="allServicesViewState">
+      <serviceView>
+        <treeState>
+          <expand />
+          <select />
+        </treeState>
+      </serviceView>
+    </option>
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -342,219 +293,62 @@
       <updated>1561213511501</updated>
       <workItem from="1561213512809" duration="18625000" />
       <workItem from="1561578935735" duration="19163000" />
+      <workItem from="1568107932272" duration="126272000" />
+      <workItem from="1569440007455" duration="1963000" />
+      <workItem from="1569449849797" duration="16813000" />
     </task>
     <servers />
-  </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="37788000" />
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="34" y="23" width="1406" height="877" extended-state="0" />
-    <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23753665" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Designer" order="2" />
-      <window_info id="Image Layers" order="3" />
-      <window_info id="Capture Tool" order="4" />
-      <window_info id="UI Designer" order="5" />
-      <window_info id="Favorites" order="6" side_tool="true" />
-      <window_info id="Web" order="7" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" visible="true" weight="0.26902887" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39892906" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Application Servers" order="7" weight="0.32931727" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Docker" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Messages" order="11" />
-      <window_info anchor="bottom" id="Java Enterprise" order="12" weight="0.32931727" />
-      <window_info anchor="bottom" id="Database Changes" order="13" />
-      <window_info anchor="bottom" id="Version Control" order="14" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Maven" order="3" />
-      <window_info anchor="right" id="Palette" order="4" />
-      <window_info anchor="right" id="Capture Analysis" order="5" />
-      <window_info anchor="right" id="Database" order="6" />
-      <window_info anchor="right" id="Palette&#9;" order="7" />
-      <window_info anchor="right" id="Theme Preview" order="8" />
-      <window_info anchor="right" id="Bean Validation" order="9" />
-    </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data.java" />
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_144.jdk/Contents/Home/src.zip!/java/lang/Object.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="158">
-          <caret line="234" column="18" selection-start-line="234" selection-start-column="18" selection-end-line="234" selection-end-column="18" />
-          <folding>
-            <element signature="e#10065#10066#0" expanded="true" />
-            <element signature="e#10148#10149#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/jakarta/ws/rs/jakarta.ws.rs-api/2.1.5/jakarta.ws.rs-api-2.1.5.jar!/javax/ws/rs/POST.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="17" column="18" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/api/MyResource.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="23" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="23" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/index.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="28" selection-start-line="2" selection-start-column="28" selection-end-line="2" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="21" lean-forward="true" selection-start-line="16" selection-start-column="21" selection-end-line="16" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/api/BuildMissionFromLatLngPoints.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="271">
-          <caret line="62" column="69" selection-start-line="62" selection-start-column="69" selection-end-line="62" selection-end-column="69" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#2479#2480#0" expanded="true" />
-            <element signature="e#2548#2549#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/brain/MissionBrain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2414">
-          <caret line="333" column="6" selection-start-line="333" selection-start-column="6" selection-end-line="333" selection-end-column="6" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#26856#26857#0" expanded="true" />
-            <element signature="e#26885#26886#0" expanded="true" />
-            <element signature="e#31161#31162#0" expanded="true" />
-            <element signature="e#31193#31194#0" expanded="true" />
-            <element signature="e#31245#31246#0" expanded="true" />
-            <element signature="e#31284#31285#0" expanded="true" />
-            <element signature="e#31341#31342#0" expanded="true" />
-            <element signature="e#31383#31384#0" expanded="true" />
-            <element signature="e#31571#31572#0" expanded="true" />
-            <element signature="e#31607#31608#0" expanded="true" />
-            <element signature="e#31670#31671#0" expanded="true" />
-            <element signature="e#31720#31721#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Constants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" selection-start-line="10" selection-end-line="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/CartesianPosition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" column="35" selection-start-line="24" selection-start-column="35" selection-end-line="24" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Config.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="79" selection-start-line="13" selection-start-column="79" selection-end-line="13" selection-end-column="79" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/GPSCartesianCoordinateSpace.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" selection-start-line="4" selection-end-line="13" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/PositionType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="26" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/Position.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="55" selection-start-line="6" selection-start-column="55" selection-end-line="6" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/filter/CORSFilter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="18" selection-start-line="18" selection-end-line="18" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/util/Geo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="1" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="31" selection-start-line="9" selection-start-column="31" selection-end-line="9" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/org/deepsouthrobotics/data/GPSPosition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="5" selection-start-line="6" selection-start-column="5" selection-end-line="6" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
-  <component name="masterDetails">
-    <states>
-      <state key="ProjectJDKs.UI">
-        <settings>
-          <last-edited>1.8</last-edited>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-    </states>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>876</line>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>561</line>
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>562</line>
+          <option name="timeStamp" value="51" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>603</line>
+          <option name="timeStamp" value="52" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>206</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>202</line>
+          <option name="timeStamp" value="54" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

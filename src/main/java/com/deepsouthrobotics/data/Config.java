@@ -1,4 +1,4 @@
-package org.deepsouthrobotics.data;
+package com.deepsouthrobotics.data;
 
 /**
 |--------------------------------------------------------------------------
@@ -17,6 +17,11 @@ public class Config
     // when building a mission, adjust flexible point by this much until boundary reached
     // basically, this is a hack and it exists until I make the algorithm less dumb
     public static final Double boundaryPushAdjustmentMeters = 0.01;
+
+    //This is basically a hack to optimize some calculations when
+    //building missions -- ideally we'd not need to use a fixed
+    //max size
+    public static final int maxMissionBoundaryMeters = 100*1000;
     
     public static final int MISSION_BUILDING_SERVICE_TIMEOUT = 7200; //number of seconds to wait for mission building service to create mission from recording
 }
