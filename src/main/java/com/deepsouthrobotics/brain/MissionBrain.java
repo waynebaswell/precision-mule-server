@@ -331,7 +331,6 @@ public class MissionBrain
 						directionRightDistance += previousToNextPointDistance;
 					}
 				}
-
 			}
 			else
 			{
@@ -354,9 +353,9 @@ public class MissionBrain
 						nextIndexLeft == point2RightMissionBoundaryVertexIndex)
 					{
 						//Next point would be a vertex of the line containing point2, so we're done
-						//with the loop -- we need to 1. add the distance from previousPoint to
-						//the vertex at point2LeftMissionBoundaryVertexIndex and 2. then from
-						//the vertex at point2LeftMissionBoundaryVertexIndex to point2
+						//with the loop -- we need to 1. add the distance from previousPoint
+						//to the vertex at nextIndexLeft and 2. then from
+						//the vertex at nextIndexLeft to point2
 
 						done = true;
 						Point2D.Double leftBoundaryPoint = missionBoundaryPoints.get(nextIndexLeft);
@@ -371,19 +370,181 @@ public class MissionBrain
 
 				//Now repeat the logic above, but chart the "right" path and it's distance
 				//Pick up right here Friday, September 27!
+				//point1 is a vertex, but point2 lies between 2 vertices -- specifically,
+				//point2 lies between point2LeftMissionBoundaryVertexIndex
+				//and point2RightMissionBoundaryVertexIndex
+				int nextIndexRight = point1MissionBoundaryVertexIndex == missionBoundaryPoints.size()-1 ? 0 : point1MissionBoundaryVertexIndex+1;
+				previousPoint = missionBoundaryPoints.get(point1MissionBoundaryVertexIndex);
+				done = false;
+				while(!done)
+				{
+					Point2D.Double nextPoint = missionBoundaryPoints.get(nextIndexRight);
+					rightPathVertices.add(nextPoint);
+					Double previousToNextPointDistance = previousPoint.distance(nextPoint);
+					directionRightDistance += previousToNextPointDistance;
+					nextIndexRight = nextIndexRight == missionBoundaryPoints.size()-1 ? 0 : nextIndexRight+1;
+					previousPoint = nextPoint;
+
+					if(nextIndexRight == point2LeftMissionBoundaryVertexIndex ||
+							nextIndexRight == point2RightMissionBoundaryVertexIndex)
+					{
+						//Next point would be a vertex of the line containing point2, so we're done
+						//with the loop -- we need to 1. add the distance from previousPoint to
+						//the vertex at nextIndexRight and 2. then add the distance
+						//from the vertex at nextIndexRight to point2
+
+						done = true;
+						Point2D.Double rightBoundaryPoint = missionBoundaryPoints.get(nextIndexRight);
+						directionRightDistance += nextPoint.distance(rightBoundaryPoint);
+						directionRightDistance += rightBoundaryPoint.distance(point2);
+
+						//we'll also need to add the rightBoundaryPoint to the rightPathVertices
+						rightPathVertices.add(rightBoundaryPoint);
+					}
+				}
 			}
 		}
-		else
-		{
+		else //point1 is NOT a vertex -- i.e. it lies between point1LeftMissionBoundaryVertexIndex
+		{	 //and point1RightMissionBoundaryVertexIndex
 			if(point2IsVertex)
 			{
 				//point1 lies between 2 vertices, but point2 is a vertex
 
+				//First find the distance by moving from point1 to point2
+				//by **subtracting** the vertices' index from point1 --
+				//I'll call moving "left" -- here we move
+				//along the boundary by subtracting
+				//from the point1 index 'till
+				//we reach point2's index
+				int nextIndexLeft = point1LeftMissionBoundaryVertexIndex == 0 ? missionBoundaryPoints.size()-1 : point1LeftMissionBoundaryVertexIndex-1;
+				Point2D.Double previousPoint = missionBoundaryPoints.get(point1LeftMissionBoundaryVertexIndex);
+				leftPathVertices.add(previousPoint);
+				directionLeftDistance += point1.distance(previousPoint);
+				boolean done = false;
+				while(!done)
+				{
+					Point2D.Double nextPoint = missionBoundaryPoints.get(nextIndexLeft);
+					leftPathVertices.add(nextPoint);
+					Double previousToNextPointDistance = previousPoint.distance(nextPoint);
+					directionLeftDistance += previousToNextPointDistance;
+					nextIndexLeft = nextIndexLeft == 0 ? missionBoundaryPoints.size()-1 : nextIndexLeft-1;
+					previousPoint = nextPoint;
+
+					if(nextIndexLeft == point2MissionBoundaryVertexIndex)
+					{
+						//Next point would be point2, so we're done with the loop --
+						//we need to add the distance from
+						//previousPoint to point2
+						done = true;
+						previousToNextPointDistance = previousPoint.distance(point2);
+						directionLeftDistance += previousToNextPointDistance;
+						//Note that we take care of adding point2 to the listOfPointsToAppendThePathTo
+						//at the very end of this method
+					}
+				}
+
+				//Now find the distance by moving from point1 to point2
+				//by **adding** the vertices' index from point1
+				//'till we reach point2's index
+				int nextIndexRight = point1RightMissionBoundaryVertexIndex == missionBoundaryPoints.size()-1 ? 0 : point1RightMissionBoundaryVertexIndex+1;
+				previousPoint = missionBoundaryPoints.get(point1RightMissionBoundaryVertexIndex);
+				rightPathVertices.add(previousPoint);
+				directionRightDistance += point1.distance(previousPoint);
+				done = false;
+				while(!done)
+				{
+					Point2D.Double nextPoint = missionBoundaryPoints.get(nextIndexRight);
+					rightPathVertices.add(nextPoint);
+					Double previousToNextPointDistance = previousPoint.distance(nextPoint);
+					directionRightDistance += previousToNextPointDistance;
+					nextIndexRight = nextIndexRight == missionBoundaryPoints.size()-1 ? 0 : nextIndexRight+1;
+					previousPoint = nextPoint;
+
+					if(nextIndexRight == point2MissionBoundaryVertexIndex)
+					{
+						done=true;
+						previousToNextPointDistance = previousPoint.distance(point2);
+						directionRightDistance += previousToNextPointDistance;
+					}
+				}
 			}
 			else
 			{
 				//point1 and point2 both lie between 2 vertices
 
+				//First find the distance by moving from point1 to point2
+				//by **subtracting** the vertices' index from point1 --
+				//I'll call moving "left" -- here we move
+				//along the boundary by subtracting
+				//from the point1 index 'till
+				//we reach point2's index
+				int nextIndexLeft = point1LeftMissionBoundaryVertexIndex == 0 ? missionBoundaryPoints.size()-1 : point1LeftMissionBoundaryVertexIndex-1;
+				Point2D.Double previousPoint = missionBoundaryPoints.get(point1LeftMissionBoundaryVertexIndex);
+				leftPathVertices.add(previousPoint);
+				directionLeftDistance += point1.distance(previousPoint);
+				boolean done = false;
+				while(!done)
+				{
+					Point2D.Double nextPoint = missionBoundaryPoints.get(nextIndexLeft);
+					leftPathVertices.add(nextPoint);
+					Double previousToNextPointDistance = previousPoint.distance(nextPoint);
+					directionLeftDistance += previousToNextPointDistance;
+					nextIndexLeft = nextIndexLeft == 0 ? missionBoundaryPoints.size()-1 : nextIndexLeft-1;
+					previousPoint = nextPoint;
+
+					if(nextIndexLeft == point2LeftMissionBoundaryVertexIndex ||
+							nextIndexLeft == point2RightMissionBoundaryVertexIndex)
+					{
+						//Next point would be a vertex of the line containing point2, so we're done
+						//with the loop -- we need to 1. add the distance from previousPoint
+						//to the vertex at nextIndexLeft and 2. then from
+						//the vertex at nextIndexLeft to point2
+
+						done = true;
+						Point2D.Double leftBoundaryPoint = missionBoundaryPoints.get(nextIndexLeft);
+						directionLeftDistance += nextPoint.distance(leftBoundaryPoint);
+						directionLeftDistance += leftBoundaryPoint.distance(point2);
+
+						//we'll need to add the Point2D.Double at point2LeftMissionBoundaryVertexIndex
+						//to the leftPathVertices
+						leftPathVertices.add(leftBoundaryPoint);
+					}
+				}
+
+				//Now find the distance by moving from point1 to point2
+				//by **adding** the vertices' index from point1
+				//'till we reach point2's index
+				int nextIndexRight = point1RightMissionBoundaryVertexIndex == missionBoundaryPoints.size()-1 ? 0 : point1RightMissionBoundaryVertexIndex+1;
+				previousPoint = missionBoundaryPoints.get(point1RightMissionBoundaryVertexIndex);
+				rightPathVertices.add(previousPoint);
+				directionRightDistance += point1.distance(previousPoint);
+				done = false;
+				while(!done)
+				{
+					Point2D.Double nextPoint = missionBoundaryPoints.get(nextIndexRight);
+					rightPathVertices.add(nextPoint);
+					Double previousToNextPointDistance = previousPoint.distance(nextPoint);
+					directionRightDistance += previousToNextPointDistance;
+					nextIndexRight = nextIndexRight == missionBoundaryPoints.size()-1 ? 0 : nextIndexRight+1;
+					previousPoint = nextPoint;
+
+					if(nextIndexRight == point2LeftMissionBoundaryVertexIndex ||
+							nextIndexRight == point2RightMissionBoundaryVertexIndex)
+					{
+						//Next point would be a vertex of the line containing point2, so we're done
+						//with the loop -- we need to 1. add the distance from previousPoint to
+						//the vertex at nextIndexRight and 2. then add the distance
+						//from the vertex at nextIndexRight to point2
+
+						done = true;
+						Point2D.Double rightBoundaryPoint = missionBoundaryPoints.get(nextIndexRight);
+						directionRightDistance += nextPoint.distance(rightBoundaryPoint);
+						directionRightDistance += rightBoundaryPoint.distance(point2);
+
+						//we'll also need to add the rightBoundaryPoint to the rightPathVertices
+						rightPathVertices.add(rightBoundaryPoint);
+					}
+				}
 			}
 		}
 
