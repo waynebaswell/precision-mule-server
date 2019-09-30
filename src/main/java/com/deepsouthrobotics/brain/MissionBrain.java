@@ -47,22 +47,28 @@ public class MissionBrain
 	{
 		List<List<Point2D.Double>> listOfPointsLists = new ArrayList<>();
 		Point2D.Double endPointAtEdgeOfBoundary = new Point2D.Double(originalPointPath.x, originalPointPath.y);
-		//First push the start point 'till it's at the edge of the missionBoundary
-		//on the given heading
+
+		//Save the Sine/Cosine values since we'll be using them often
+		Double cos = Math.cos(headingRadians);
+		Double sin = Math.sin(headingRadians);
+
+		//First push the start point 'till it's at the edge of
+		//the missionBoundary on the given heading
 		while(missionBoundary.contains(endPointAtEdgeOfBoundary))
 		{
-			endPointAtEdgeOfBoundary.x += Math.cos(headingRadians) * .01;
-			endPointAtEdgeOfBoundary.y += Math.sin(headingRadians) * .01;
+			endPointAtEdgeOfBoundary.x += cos * .01;
+			endPointAtEdgeOfBoundary.y += sin * .01;
 		}
+
 		//In the while... statement above we pushed the start point just beyond
 		//the boundary, so lets bring it back to the last point within
 		//the boundary and then begin looking for more valid points
 		//on the same heading
-		endPointAtEdgeOfBoundary.x -= Math.cos(headingRadians) * .01;
-		endPointAtEdgeOfBoundary.y -= Math.sin(headingRadians) * .01;
+		endPointAtEdgeOfBoundary.x -= cos * .01;
+		endPointAtEdgeOfBoundary.y -= sin * .01;
 
 
-		//Define a new variable "point" that we'll work with -- at first point
+		//Define a new variable "point" that we'll work with -- at first "point"
 		//will be equal to the endPointAtEdeOfBoundary, but we'll push
 		//it along the path's heading in search of a valid
 		//section of polygon out in the distance
@@ -77,21 +83,21 @@ public class MissionBrain
 		//this heading
 		while(point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY)
 		{
-			Double xComponentAdd = Math.cos(headingRadians) * (Config.minMowingLineDistanceMeters-.01);
-			Double yComponentAdd = Math.sin(headingRadians) * (Config.minMowingLineDistanceMeters-.01);
+			Double xComponentAdd = cos * (Config.minMowingLineDistanceMeters-.01);
+			Double yComponentAdd = sin * (Config.minMowingLineDistanceMeters-.01);
 			point.x += xComponentAdd;
 			point.y += yComponentAdd;
 			if(missionBoundary.contains(point))
 			{
-				//once we find a point within the polygon we're only part of the way to knowing if
-				//this is a valid mission point -- in order to know if it's valid we have to back
-				//up to the polygon edge where the line containing this point begins -- and then
-				//push from that point 'till we find the end of the line and figure out
-				//if the distance is sufficient to consider this
-				//a valid mission line
+				//once we find a point within the polygon we're only part of the way to knowing
+				//if this is a valid mission point -- in order to know if it's valid we have
+				//to back up to the polygon edge where the line containing this point
+				//begins -- and then push from that point 'till we find the end
+				//of the line and figure out if the distance is sufficient
+				//to consider this a valid mission line
 				Point2D.Double newBeginPoint = new Point2D.Double(point.x, point.y);
-				Double xCentimeterBump = Math.cos(headingRadians) * .01;
-				Double yCentimeterBump = Math.sin(headingRadians) * .01;
+				Double xCentimeterBump = cos * .01;
+				Double yCentimeterBump = sin * .01;
 				while(missionBoundary.contains(newBeginPoint))
 				{
 					newBeginPoint.x -= xCentimeterBump;
@@ -120,15 +126,42 @@ public class MissionBrain
 					pointsFromOriginalPointToNewStartingPoint.add(newEndPoint);
 					//Now pointsFromOriginalPointToNewStartingPoint is a big beautiful
 					//List of points from the originalPointPath point that we called
-					//this method with tracing around the bondary 'till the next
+					//this method with tracing around the boundary 'till the next
 					//valid point start and then containing that point's end
 
 					//So let's go ahead and add it to the List of Lists
 					//that we will return
 					listOfPointsLists.add(pointsFromOriginalPointToNewStartingPoint);
 
-					//Next up -- figure out how to look beyond the newEndPoint to see
-					//if there are additional places to mow out in the distance...
+					//Now do some setup so we'll be able to see if there are
+					//additional places to mow out in the distance...
+
+					//We're just setting up the variables to mirror
+					//how they are set up at the beginning
+					//of this while loop
+					endPointAtEdgeOfBoundary.x = newEndPoint.x;
+					endPointAtEdgeOfBoundary.y = newEndPoint.y;
+
+					//Do the logic to ensure we're at the end of the mission boundary
+					//before we resume looking for new points out in the distance
+					while(missionBoundary.contains(endPointAtEdgeOfBoundary))
+					{
+						endPointAtEdgeOfBoundary.x += cos * .01;
+						endPointAtEdgeOfBoundary.y += sin * .01;
+					}
+					//In the while... statement above we pushed the start point just beyond
+					//the boundary, so lets bring it back to the last point within
+					//the boundary and then begin looking for more valid points
+					//on the same heading
+					endPointAtEdgeOfBoundary.x -= cos * .01;
+					endPointAtEdgeOfBoundary.y -= sin * .01;
+
+					//Remember that the "point" variable is the pioneering variable that we push
+					//out into the distance looking for valid mission points -- the
+					//"endPointAtEdgeOfBoundary" is the edge of the boundary
+					//where we last recorded a valid mission point
+					point.x = endPointAtEdgeOfBoundary.x;
+					point.y = endPointAtEdgeOfBoundary.y;
 				}
 			}
 		}
@@ -678,6 +711,32 @@ public class MissionBrain
 		}
 	}
 
+	public List<GPSPosition> flattenListOfPoint2DListsThenConvertToGPSPositionList(
+			List<List<Point2D.Double>> additionalPointsOnThisHeading,
+			GPSCartesianCoordinateSpace space
+
+	)
+	{
+		List<GPSPosition> gpsPoints = new ArrayList<>();
+
+		if(additionalPointsOnThisHeading != null)
+		{
+			for(int x = 0; x < additionalPointsOnThisHeading.size(); x++)
+			{
+				List<Point2D.Double> points = additionalPointsOnThisHeading.get(x);
+				if(points != null)
+				{
+					for(int y = 0; y < points.size(); y++)
+					{
+						Point2D.Double point = points.get(y);
+						gpsPoints.add(space.gpsPositionGivenDistanceFromZeroZero(point.x, point.y));
+					}
+				}
+			}
+		}
+		return gpsPoints;
+	}
+
 	/**
 	  Builds mission waypoints from InputStream
 	 */
@@ -718,7 +777,7 @@ public class MissionBrain
 		GPSCartesianCoordinateSpace space = new GPSCartesianCoordinateSpace(missionBoundaryGPSPositionList.get(1));
 
 		Double headingRadians = Math.toRadians(headingDegrees);
-        Path2D missionBoundary = missionBoundary(missionBoundaryGPSPositionList);
+        Path2D.Double missionBoundary = missionBoundary(missionBoundaryGPSPositionList);
 
 		adjustStartingPointIfFirstLineIsTooShort(startGPSPosition, missionBoundary, headingRadians);
 		startGPSPosition = space.gpsPositionGivenDistanceFromZeroZero(startGPSPosition.x, startGPSPosition.y);
@@ -751,11 +810,9 @@ public class MissionBrain
 
 		Point2D.Double currentTopPoint = new Point2D.Double(guide.x, guide.y);
 		Point2D.Double currentBottomPoint = new Point2D.Double(startGPSPosition.x, startGPSPosition.y);
-		
-		Point2D.Double lastTopPoint = new Point2D.Double(currentTopPoint.x, currentTopPoint.y);
+
 		Point2D.Double lastBottomPoint = new Point2D.Double(currentBottomPoint.x, currentBottomPoint.y);
-		
-		GPSPosition lastTopGPS = space.gpsPositionGivenDistanceFromZeroZero(guide.x, guide.y); //this.getGuidePointGPS();
+
 		GPSPosition lastBottomGPS = new GPSPosition(startGPSPosition.latitude,
 				startGPSPosition.longitude, startGPSPosition.x, startGPSPosition.y);//this.getStartGPS();
 		
@@ -763,25 +820,41 @@ public class MissionBrain
 		
     	//The first mission point will always be the start position
     	missionWaypoints.add(startGPSPosition);
-    	
-    	//The second mission point will always be the guide point adjusted to ensure next turn is within boundary
-		Boolean ADD_ANOTHER_PATH_LINE = adjustTurnInitiationPointSoThatNextOrthogonalPointIsWithinBoundary(currentBottomPoint, currentTopPoint, normPerpXY, missionBoundary);
-		
 		GPSPosition adjustedGuideGPS = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
-		//CartesianPosition adjustedGuideCart = new CartesianPosition(currentTopPoint.x, currentTopPoint.y);
-		//Position adjustedGuidePosition = new Position(PositionType.GPS, -1, adjustedGuideGPS, adjustedGuideCart);
 		missionWaypoints.add(adjustedGuideGPS);
 
 		//baswell begin new fancy look-beyond-boundary logic
+		List<List<Point2D.Double>> additionalPointsOnThisHeading = additionalValidMissionPointsOnTheGivenPointPathAndHeading(
+				missionBoundary,
+				adjustedGuideGPS,
+				headingRadians,
+				minX,
+				maxX,
+				minY,
+				maxY
+		);
 
-		//first you have to push beyond the immediate boundary of the current
-		//polygon -- the adjustTurnInitiation... logic above will make
-		//it such that our guidepoint may not be at the end
-
-
-
+		List<GPSPosition> flatPoints = flattenListOfPoint2DListsThenConvertToGPSPositionList(
+				additionalPointsOnThisHeading, space);
+		if(flatPoints.size() > 0)
+		{
+			for(int x = 0; x < flatPoints.size(); x++)
+			{
+				missionWaypoints.add(flatPoints.get(x));
+			}
+		}
 		//baswell end new fancy look-beyond-boundary logic
-		
+
+		Point2D.Double lastMissionWaypoint = missionWaypoints.get(missionWaypoints.size()-1);
+
+    	//The second mission point will always be the guide point adjusted to ensure next turn is within boundary
+		Boolean ADD_ANOTHER_PATH_LINE = adjustTurnInitiationPointSoThatNextOrthogonalPointIsWithinBoundary(currentBottomPoint, lastMissionWaypoint, normPerpXY, missionBoundary);
+
+		//Set up the currentTopPoint/lastTopPoint variables to make the mission-waypoint-adding logic below work as intended
+		currentTopPoint = new Point2D.Double(lastMissionWaypoint.x, lastMissionWaypoint.y);
+		Point2D.Double lastTopPoint = new Point2D.Double(currentTopPoint.x, currentTopPoint.y);
+		GPSPosition lastTopGPS = space.gpsPositionGivenDistanceFromZeroZero(lastTopPoint.x, lastTopPoint.y);
+
 		for(int i = 1; ADD_ANOTHER_PATH_LINE; i++)
 		{
 			if(i%2 != 0) //we are at the top -- so set the top point to the perpendicular offset and push the bottom point to missionBoundary
@@ -793,30 +866,57 @@ public class MissionBrain
 				currentBottomPoint.y = currentTopPoint.y;
 
 				pushLineToBoundary(currentTopPoint, currentBottomPoint, normParallel, missionBoundary);
+
+				List<List<Point2D.Double>> additionalPoints = additionalValidMissionPointsOnTheGivenPointPathAndHeading(
+						missionBoundary,
+						currentBottomPoint,
+						headingRadians+Math.PI,
+						minX,
+						maxX,
+						minY,
+						maxY
+				);
+
+				GPSPosition firstLineStopPoint = space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y);
+
+				List<GPSPosition> flattenedPoints = flattenListOfPoint2DListsThenConvertToGPSPositionList(
+						additionalPoints, space);
+
+				if(flattenedPoints.size()> 0)
+				{
+					lastMissionWaypoint = missionWaypoints.get(flattenedPoints.size()-1);
+					currentBottomPoint = new Point2D.Double(lastMissionWaypoint.x, lastMissionWaypoint.y);
+				}
+
 				ADD_ANOTHER_PATH_LINE = adjustTurnInitiationPointSoThatNextOrthogonalPointIsWithinBoundary(currentTopPoint, currentBottomPoint, normPerpXY, missionBoundary);
-				
-				double topOffsetX = currentTopPoint.x - lastTopPoint.x;
-				double topOffsetY = currentTopPoint.y - lastTopPoint.y;
-				
-				double bottomOffsetX = currentBottomPoint.x - currentTopPoint.x;
-				double bottomOffsetY = currentBottomPoint.y - currentTopPoint.y;
-				
+
 				if(ADD_ANOTHER_PATH_LINE)
 				{
 					GPSPosition newTopGPS = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
-					//GPSPosition newTopGPS = geo.offset(lastTopGPS, topOffsetX, topOffsetY);
-					//CartesianPosition cart = new CartesianPosition(currentTopPoint.x, currentTopPoint.y);
+
 					missionWaypoints.add(newTopGPS);
 					System.out.println(i+"Top "+ newTopGPS.latitude + " " + newTopGPS.longitude + " Distance: " + geo.latLongDistance(lastTopGPS.latitude, lastTopGPS.longitude, newTopGPS.latitude, newTopGPS.longitude));
-					//System.out.println(i+"A Top "+ gps.latitude + " " + gps.longitude + " Distance: " + geo.latLongDistance(lastTopGPS.latitude, lastTopGPS.longitude, gps.latitude, gps.longitude));
+
 					lastTopGPS = newTopGPS;
 					
 					if(Math.abs(currentTopPoint.distance(currentBottomPoint)) >= Config.minMowingLineDistanceMeters)
 					{
 						GPSPosition newBottomGPS = space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y);
-						//GPSPosition newBottomGPS = geo.offset(newTopGPS, bottomOffsetX, bottomOffsetY);
-						//cart = new CartesianPosition(currentBottomPoint.x, currentBottomPoint.y);
-						missionWaypoints.add(newBottomGPS);
+						missionWaypoints.add(firstLineStopPoint);
+
+						if(flatPoints.size() > 0)
+						{
+							for(int x = 0; x < flatPoints.size()-1; x++)
+							{
+								missionWaypoints.add(flatPoints.get(x));
+							}
+						}
+
+						//up in the adjustTurnInitiationPoint... method above we do some karate on the last
+						//point (i.e. currentBottomPoint) -- so we want add the karateified point
+						//to the missionWaypoints list
+						missionWaypoints.add(space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y));
+
 						lastBottomGPS = newBottomGPS;
 					}
 					else
@@ -841,30 +941,56 @@ public class MissionBrain
 				currentTopPoint.y = currentBottomPoint.y;
 				
 				pushLineToBoundary(currentBottomPoint, currentTopPoint, normParallelNegative, missionBoundary);
+
+				List<List<Point2D.Double>> additionalPoints = additionalValidMissionPointsOnTheGivenPointPathAndHeading(
+						missionBoundary,
+						currentTopPoint,
+						headingRadians,
+						minX,
+						maxX,
+						minY,
+						maxY
+				);
+
+				GPSPosition firstLineStopPoint = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
+
+				List<GPSPosition> flattenedPoints = flattenListOfPoint2DListsThenConvertToGPSPositionList(
+						additionalPoints, space);
+
+				if(flattenedPoints.size()> 0)
+				{
+					lastMissionWaypoint = missionWaypoints.get(flattenedPoints.size()-1);
+					currentTopPoint = new Point2D.Double(lastMissionWaypoint.x, lastMissionWaypoint.y);
+				}
+
 				ADD_ANOTHER_PATH_LINE = adjustTurnInitiationPointSoThatNextOrthogonalPointIsWithinBoundary(currentBottomPoint, currentTopPoint, normPerpXY, missionBoundary);
-				
-				double topOffsetX = currentTopPoint.x - currentBottomPoint.x;
-				double topOffsetY = currentTopPoint.y - currentBottomPoint.y;
-				
-				double bottomOffsetX = currentBottomPoint.x - lastBottomPoint.x;
-				double bottomOffsetY = currentBottomPoint.y - lastBottomPoint.y;
 				
 				if(ADD_ANOTHER_PATH_LINE)
 				{
 					GPSPosition newBottomGPS = space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y);
-					//GPSPosition newBottomGPS = geo.offset(lastBottomGPS, bottomOffsetX, bottomOffsetY);
-					//CartesianPosition cart = new CartesianPosition(currentBottomPoint.x, currentBottomPoint.y);
 					missionWaypoints.add(newBottomGPS);
 					System.out.println(i+"Bottom lat:"+ newBottomGPS.latitude + " lon:" + newBottomGPS.longitude + " x: " + newBottomGPS.x + " y:" + newBottomGPS.y +" Distance: " + geo.latLongDistance(lastBottomGPS.latitude, lastBottomGPS.longitude, newBottomGPS.latitude, newBottomGPS.longitude));
-					//System.out.println(i+"B Bottom "+ gps.latitude + " " + gps.longitude + " Distance: " + geo.latLongDistance(lastBottomGPS.latitude, lastBottomGPS.longitude, gps.latitude, gps.longitude));
 					lastBottomGPS = newBottomGPS;
 					
 					if(Math.abs(currentTopPoint.distance(currentBottomPoint)) >= Config.minMowingLineDistanceMeters)
 					{
 						GPSPosition newTopGPS = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
-						//GPSPosition newTopGPS = geo.offset(newBottomGPS, topOffsetX, topOffsetY);
-						//cart = new CartesianPosition(currentTopPoint.x, currentTopPoint.y);
-						missionWaypoints.add(newTopGPS);
+
+						missionWaypoints.add(firstLineStopPoint);
+
+						if(flatPoints.size() > 0)
+						{
+							for(int x = 0; x < flatPoints.size()-1; x++)
+							{
+								missionWaypoints.add(flatPoints.get(x));
+							}
+						}
+
+						//up in the adjustTurnInitiationPoint... method above we do some karate on the last
+						//point (i.e. currentTopPoint) -- so we want add the karateified point
+						//to the missionWaypoints list
+						missionWaypoints.add(space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y));
+
 						lastTopGPS = newTopGPS;
 					}
 					else
@@ -887,10 +1013,6 @@ public class MissionBrain
 
     public static void main(String[] args)
     {
-    	//Path2D p1 = new Path2D.Double();
-		//Path2D p2 = new Path2D.Double();
-
-
     	MissionBrain mpr = new MissionBrain();
     	String testWaypointFormatStatic = "11	0	3	16	0	0	0	0	30.563625	-87.678372	100.000000	1";
     	GPSPosition gps = new GPSPosition();
@@ -1299,7 +1421,8 @@ public class MissionBrain
 //    				Constants.SERIALIZE_CARTESIAN_TYPE.equalsIgnoreCase(str) ? PositionType.Cartesian : null;
 //    	return positionType;
 //    }
-    
+
+
     /*
      * Returns FALSE if we didn't adjust the line for the next orthogonal point since doing so would have
      * made the current line's value less than Config.Config.minMowingLineDistanceMeters.  In other words,
