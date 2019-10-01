@@ -25,14 +25,8 @@ import java.util.List;
 */
 public class MissionBrain
 {
-    //public List<Position> positions;
-    //public CartesianPosition guidePointCartesian;
-    //public GPSPosition guidePointGPS;
-
-
     public MissionBrain()
     {
-    	//positions = new ArrayList<>();
     }
 
     public List<List<Point2D.Double>> additionalValidMissionPointsOnTheGivenPointPathAndHeading(
@@ -771,7 +765,7 @@ public class MissionBrain
 
 		//Not entirely sure we need this space variable --
 		//the idea is you're passing in some coordinate
-		// other than the home coordinate --
+		//other than the home coordinate --
 		//before we got rid of "GuidePoint" stuff we were
 		//passing in the guidepoint coordinate
 		GPSCartesianCoordinateSpace space = new GPSCartesianCoordinateSpace(missionBoundaryGPSPositionList.get(1));
@@ -844,7 +838,7 @@ public class MissionBrain
 			}
 		}
 		//baswell end new fancy look-beyond-boundary logic
-
+		
 		Point2D.Double lastMissionWaypoint = missionWaypoints.get(missionWaypoints.size()-1);
 
     	//The second mission point will always be the guide point adjusted to ensure next turn is within boundary
@@ -1059,16 +1053,6 @@ public class MissionBrain
 		pos.y = lngMeters;
 	}
 
-//	public List<LatLng> GPSPositionListToLatLngList(List<GPSPosition> gpsList)
-//	{
-//		List<LatLng> llList = new ArrayList<>();
-//		for(int x = 0; x < gpsList.size(); x++)
-//		{
-//			llList.add(gpsList.get(x).toLatLng());
-//		}
-//		return llList;
-//	}
-
 	/**
 	 *
 	 * @param missionBoundaryGPSPositionList List of coordinates that represent the
@@ -1093,16 +1077,6 @@ public class MissionBrain
 			GPSPosition startGPSPositionUnchecked,
 			Double heading)
 	{
-		//New method begin
-
-		//Build LatLng objects from the given GPSPosition objects
-//		List<LatLng> missionLatLngList = GPSPositionListToLatLngList(missionBoundaryGPSPositionList);
-//		List<List<LatLng>> polyObstaclesLatLngList = new ArrayList<>();
-//		for(List<GPSPosition> list : polyObstaclesGPSPositionList)
-//		{
-//			polyObstaclesLatLngList.add(GPSPositionListToLatLngList(list));
-//		}
-//		LatLng startLatLng = startGPSPosition.toLatLng();
 		//Now figure out if the startLatLng is within the mission polygon -- if it is
 		//then that will be the mission starting point -- if it's not then
 		//find the nearest vertex on the mission polygon to the point
@@ -1119,26 +1093,7 @@ public class MissionBrain
 					startGPSPositionUnchecked, missionBoundaryGPSPositionList.get(x));
 		}
 
-
-		//Path2D missionBoundaryPath2D = missionBoundary(missionBoundaryGPSPositionList);
-
 		GPSPosition startGPSPosition = getClosestPolygonVertexIfPointNotWithinPolygon(startGPSPositionUnchecked, missionBoundaryGPSPositionList);
-		//startGPSPosition = ((DSRLatLng)startLatLng).toGPSPosition();
-		//New method end
-
-		//Old method begin
-		//Now gpsPositionList contains the gps positions
-		System.out.println("Now let's do some KARATE on the gps positions...");
-
-//		//We'll say that the first item in gpsPositionList is the home position (0,0)
-//		CartesianPosition cpZero = new CartesianPosition();
-//		cpZero.x = 0.0;
-//		cpZero.y = 0.0;
-//		cpZero.localTimeReceivedMillis = 1l;
-//		cpZero.autopilotTimeRecordedMillis = 1l;
-//
-//		List<CartesianPosition> cartesianPositionList = new ArrayList<>();
-//		cartesianPositionList.add(cpZero);
 
 		//If startGPSPosition is one of the mission boundary polygon vertices,
 		//this moves it to the beginning of the list
@@ -1151,38 +1106,11 @@ public class MissionBrain
 			setXLatandYLngMetersByDiffingLatAndLonDistanceFromGPSPosition(startGPSPosition, missionBoundaryGPSPositionList.get(x));
 		}
 
-		//StringBuffer mprBuffer = new StringBuffer();
-		//WE've gotta have at least 3 coordinates in order for
-		//any of this logic to make sense (i.e. if you've only got 2 points
+		//Note that we've gotta have at least 3 coordinates in order for any of
+		//this logic to make sense (i.e. if you've only got 2 points
 		//then you've got a line, which doesn't have area and
 		//won't contain waypoints by definition)
 
-//		if(missionGPSPositionList.size() >= 3)
-//		{
-//			//CartesianPosition guidepointC = cartesianPositionList.get(1);
-//			GPSPosition guidepointG = missionGPSPositionList.get(1);
-//
-//			mprBuffer.append(guidepointC.buildGuidePointString()+"\n"); //Add Cartesian guidepoint
-//			mprBuffer.append(guidepointG.buildGuidePointString()+"\n"); //Add GPS guidepoint
-//
-//			for(int x = 0, y=0; x < missionGPSPositionList.size(); x++)
-//			{
-//				mprBuffer.append(missionGPSPositionList.get(x).buildPointString(y++)+"\n");
-//				//mprBuffer.append(cartesianPositionList.get(x).buildPointString(y++)+"\n");
-//			}
-//		}
-
-//		InputStream mprInputStream = new ByteArrayInputStream(mprBuffer.toString().getBytes(StandardCharsets.UTF_8));
-//		String text = "";
-//		try
-//		{
-//			text = IOUtils.toString(mprInputStream, StandardCharsets.UTF_8.name());
-//		}
-//		catch (IOException e)
-//		{
-//			e.printStackTrace();
-//		}
-//
 		List<GPSPosition> waypoints = this.buildMissionWaypointsFromInputStream(
 				missionBoundaryGPSPositionList, mowingPathWidthInMeters, heading, startGPSPosition);
 
@@ -1252,26 +1180,6 @@ public class MissionBrain
 			}
 			return closestVertex;
 		}
-
-		//Old code:
-//		if(PolyUtil.containsLocation(point, polygon, true))
-//		{
-//			return point;
-//		}
-//
-//		double distanceBetweenPoints = Double.MAX_VALUE;
-//		LatLng closestPoint = null;
-//
-//		for(LatLng vertex : polygon)
-//		{
-//			double thisDistance = SphericalUtil.computeDistanceBetween(point, vertex);
-//			if(thisDistance < distanceBetweenPoints)
-//			{
-//				distanceBetweenPoints = thisDistance;
-//				closestPoint = vertex;
-//			}
-//		}
-//		return closestPoint;
 	}
 
 	/**
@@ -1286,142 +1194,6 @@ public class MissionBrain
     {
     	return index + "\t0\t3\t16\t0\t0\t0\t0\t" + gps.getLatitude() + "\t" + gps.getLongitude() + "\t100.000000\t1";
     }
-    
-//    private void loadPositionsFromMissionPlanRecordingFromInputStream(InputStream inputStreamMissionPlanRecordingLines)
-//    {
-//    	try
-//    	{
-//        	// Open the file
-//        	BufferedReader br = new BufferedReader(new InputStreamReader(inputStreamMissionPlanRecordingLines));
-//
-//        	String line;
-//
-//        	//Read file line by line
-//        	while ((line = br.readLine()) != null)   {
-//
-//        		String[] vals = line.split(Constants.SERIALIZE_LINE_VAL_SEPARATOR);
-//
-//        		if(vals != null && vals.length > 0)
-//        		{
-//            		if(Constants.SERIALIZE_GUIDEPOINT_CARTESIAN_TYPE.equalsIgnoreCase(vals[0]))
-//            		{
-//            			/*
-//            			 * Expected line format:
-//            			 *
-//            			 * GUIDEPOINT_CARTESIAN CARTESIAN X:-4.57 Y:-1.68 AUTOPILOT_TIME_MILLIS:126446 LOCAL_TIME_MILLIS:1487617141467
-//            			 *
-//            			 */
-//            			this.guidePointCartesian = loadCartesianGuidepoint(vals);
-//            		}
-//            		else if(Constants.SERIALIZE_GUIDEPOINT_GPS_TYPE.equalsIgnoreCase(vals[0]))
-//            		{
-//            			/*
-//            			 * Expected line format:
-//            			 *
-//            			 * GUIDEPOINT_GPS GPS LAT:30.5635939 LON:-87.6780064 FIX_TYPE:3
-// 						 *
-//            			 */
-//            			this.guidePointGPS = loadGPSGuidepoint(vals);
-//            		}
-//            		else if(Constants.SERIALIZE_POINT_TYPE.equalsIgnoreCase(vals[0]))
-//            		{
-//            			/*
-//            			 * Expected line format:
-//            			 *
-//            			 * POINT 199 CARTESIAN X:-1.12 Y:-0.89 AUTOPILOT_TIME_MILLIS:103865 LOCAL_TIME_MILLIS:1487617118875
-//            			 * -----or-----
-//            			 * POINT 201 GPS LAT:30.5636255 LON:-87.6780056 FIX_TYPE:3
-//            			 *
-//            			 */
-//
-//            			Position position = buildPositionFromMissionPlanRecordingLineArray(vals);
-//            			this.addPosition(position);
-//
-//            		}
-//        		}
-//
-//        	}
-//
-//        	//Close the input stream
-//        	br.close();
-//    	}
-//    	catch(FileNotFoundException e1)
-//    	{
-//    		System.out.println("FileNotFoundException --> MissionDAO.java --> " + e1.toString());
-//    	}
-//    	catch(IOException e2)
-//    	{
-//    		System.out.println("IOException --> MissionDAO.java --> " + e2.toString());
-//    	}
-//    }
-    
-//    /*
-//     * Expected line is of the form:
-//     *
-//	 * GUIDEPOINT_CARTESIAN CARTESIAN X:-4.57 Y:-1.68 AUTOPILOT_TIME_MILLIS:126446 LOCAL_TIME_MILLIS:1487617141467
-//	 *
-//     */
-//    private CartesianPosition loadCartesianGuidepoint(String[] vals)
-//    {
-//    	String[] positionVals = Arrays.copyOfRange(vals, 2, vals.length);
-//    	return CartesianPosition.buildFromKeyValArray(positionVals);
-//    }
-    
-//    /*
-//     * Expected line is of the form:
-//     *
-//	 *	GUIDEPOINT_GPS GPS LAT:30.5635939 LON:-87.6780064 FIX_TYPE:3
-//	 *
-//     */
-//    private GPSPosition loadGPSGuidepoint(String[] vals)
-//    {
-//    	String[] positionVals = Arrays.copyOfRange(vals, 2, vals.length);
-//    	return GPSPosition.buildFromKeyValArray(positionVals);
-//    }
-    
-//    /*
-//     * Expected array is of the form:
-//     *
-//     * [POINT] [32] [CARTESIAN] [X:-2.72] [Y:0.57] [AUTOPILOT_TIME_MILLIS:131559] [LOCAL_TIME_MILLIS:1487620496519]
-//     *
-//     * ------or------
-//     *
-//     * [POINT] [24] [GPS] [LAT:30.5636187] [LON:-87.6780116] [FIX_TYPE:3]
-//	 *
-//     */
-//    private Position buildPositionFromMissionPlanRecordingLineArray(String[] vals)
-//    {
-//
-//		Integer recordIndex = Integer.parseInt(vals[1]);
-//    	PositionType positionType = guidePointTypeFromString(vals[2]);
-//    	String[] positionVals = Arrays.copyOfRange(vals, 2, vals.length);
-//
-//    	Position position = new Position();
-//    	position.setType(positionType);
-//    	position.setRecordIndex(recordIndex);
-//
-//    	if(positionType == PositionType.Cartesian)
-//    	{
-//    		CartesianPosition cp = CartesianPosition.buildFromKeyValArray(positionVals);
-//        	position.setCartesian(cp);
-//    	}
-//    	else if(positionType == PositionType.GPS)
-//    	{
-//    		GPSPosition gps = GPSPosition.buildFromKeyValArray(positionVals);
-//        	position.setGps(gps);
-//    	}
-//
-//    	return position;
-//    }
-    
-//    private PositionType guidePointTypeFromString(String str)
-//    {
-//    	PositionType positionType =
-//    			Constants.SERIALIZE_GPS_TYPE.equalsIgnoreCase(str) ? PositionType.GPS :
-//    				Constants.SERIALIZE_CARTESIAN_TYPE.equalsIgnoreCase(str) ? PositionType.Cartesian : null;
-//    	return positionType;
-//    }
-
 
     /*
      * Returns FALSE if we didn't adjust the line for the next orthogonal point since doing so would have
@@ -1713,29 +1485,4 @@ public class MissionBrain
             System.out.println(ex.toString());
         }
     }
-
-//    public List<Position> getPoints() {
-//        return positions;
-//    }
-
-//    public void setPoints(List<Position> points) {
-//        this.positions = points;
-//    }
-//
-//    public CartesianPosition getGuidePointCartesian() {
-//        return guidePointCartesian;
-//    }
-//
-//    public void setGuidePointCartesian(CartesianPosition guidePointCartesian) {
-//        this.guidePointCartesian = guidePointCartesian;
-//    }
-//
-//    public GPSPosition getGuidePointGPS() {
-//        return guidePointGPS;
-//    }
-//
-//    public void setGuidePointGPS(GPSPosition guidePointGPS) {
-//        this.guidePointGPS = guidePointGPS;
-//    }
-
 }
