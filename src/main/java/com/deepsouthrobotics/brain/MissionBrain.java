@@ -5,9 +5,9 @@ import com.deepsouthrobotics.data.GPSCartesianCoordinateSpace;
 import com.deepsouthrobotics.data.GPSPosition;
 import com.deepsouthrobotics.util.Geo;
 
+import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
-import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -30,7 +30,8 @@ public class MissionBrain
     }
 
     public List<List<Point2D.Double>> additionalValidMissionPointsOnTheGivenPointPathAndHeading(
-			Path2D.Double missionBoundary,
+			Path2D.Double missionBoundaryPath,
+			List<GPSPosition> missionBoundaryPoints,
 			Point2D.Double originalPointPath,
 			Double headingRadians,
 			Double minX,
@@ -46,10 +47,13 @@ public class MissionBrain
 		Double cos = Math.cos(headingRadians);
 		Double sin = Math.sin(headingRadians);
 
+		boolean pushed = false;
+
 		//First push the start point 'till it's at the edge of
 		//the missionBoundary on the given heading
-		while(missionBoundary.contains(endPointAtEdgeOfBoundary))
+		while(missionBoundaryPath.contains(endPointAtEdgeOfBoundary))
 		{
+			pushed = true;
 			endPointAtEdgeOfBoundary.x += cos * .01;
 			endPointAtEdgeOfBoundary.y += sin * .01;
 		}
@@ -58,9 +62,11 @@ public class MissionBrain
 		//the boundary, so lets bring it back to the last point within
 		//the boundary and then begin looking for more valid points
 		//on the same heading
-		endPointAtEdgeOfBoundary.x -= cos * .01;
-		endPointAtEdgeOfBoundary.y -= sin * .01;
-
+		if(pushed)
+		{
+			endPointAtEdgeOfBoundary.x -= cos * .01;
+			endPointAtEdgeOfBoundary.y -= sin * .01;
+		}
 
 		//Define a new variable "point" that we'll work with -- at first "point"
 		//will be equal to the endPointAtEdeOfBoundary, but we'll push
@@ -81,7 +87,7 @@ public class MissionBrain
 			Double yComponentAdd = sin * (Config.minMowingLineDistanceMeters-.01);
 			point.x += xComponentAdd;
 			point.y += yComponentAdd;
-			if(missionBoundary.contains(point))
+			if(missionBoundaryPath.contains(point))
 			{
 				//once we find a point within the polygon we're only part of the way to knowing
 				//if this is a valid mission point -- in order to know if it's valid we have
@@ -92,7 +98,7 @@ public class MissionBrain
 				Point2D.Double newBeginPoint = new Point2D.Double(point.x, point.y);
 				Double xCentimeterBump = cos * .01;
 				Double yCentimeterBump = sin * .01;
-				while(missionBoundary.contains(newBeginPoint))
+				while(missionBoundaryPath.contains(newBeginPoint))
 				{
 					newBeginPoint.x -= xCentimeterBump;
 					newBeginPoint.y -= yCentimeterBump;
@@ -100,7 +106,7 @@ public class MissionBrain
 				newBeginPoint.x += xCentimeterBump;
 				newBeginPoint.y += yCentimeterBump;
 				Point2D.Double newEndPoint = polygonEdgePointByFollowingGivenStartingPointAndHeading(
-						missionBoundary, newBeginPoint, headingRadians);
+						missionBoundaryPath, newBeginPoint, headingRadians);
 				if(newBeginPoint.distance(newEndPoint) >= 2.0)
 				{
 					//Well, congratulations folks, we've got a valid mission point out beyond where the
@@ -112,12 +118,12 @@ public class MissionBrain
 					List<Point2D.Double> pointsFromOriginalPointToNewStartingPoint = new ArrayList<>();
 					if(originalPointPath.distance(endPointAtEdgeOfBoundary) != 0)
 					{
-						pointsFromOriginalPointToNewStartingPoint.add(endPointAtEdgeOfBoundary);
+						pointsFromOriginalPointToNewStartingPoint.add(new Point2D.Double(endPointAtEdgeOfBoundary.x, endPointAtEdgeOfBoundary.y));
 					}
 					tracePathAlongMissionBoundaryFromOnePointToAnotherPointAddingVerticesOfTheShortestPath(
-							missionBoundary, endPointAtEdgeOfBoundary, newBeginPoint,
+							missionBoundaryPoints, endPointAtEdgeOfBoundary, newBeginPoint,
 							pointsFromOriginalPointToNewStartingPoint);
-					pointsFromOriginalPointToNewStartingPoint.add(newEndPoint);
+					pointsFromOriginalPointToNewStartingPoint.add(new Point2D.Double(newEndPoint.x, newEndPoint.y));
 					//Now pointsFromOriginalPointToNewStartingPoint is a big beautiful
 					//List of points from the originalPointPath point that we called
 					//this method with tracing around the boundary 'till the next
@@ -138,7 +144,7 @@ public class MissionBrain
 
 					//Do the logic to ensure we're at the end of the mission boundary
 					//before we resume looking for new points out in the distance
-					while(missionBoundary.contains(endPointAtEdgeOfBoundary))
+					while(missionBoundaryPath.contains(endPointAtEdgeOfBoundary))
 					{
 						endPointAtEdgeOfBoundary.x += cos * .01;
 						endPointAtEdgeOfBoundary.y += sin * .01;
@@ -164,7 +170,7 @@ public class MissionBrain
 	}
 
 	public void tracePathAlongMissionBoundaryFromOnePointToAnotherPointAddingVerticesOfTheShortestPath(
-			Path2D.Double missionBoundary,
+			List<GPSPosition> missionBoundaryPoints,
 			Point2D.Double point1,
 			Point2D.Double point2,
 			List<Point2D.Double> listOfPointsToAppendThePathTo
@@ -174,7 +180,7 @@ public class MissionBrain
 		//is a vertex on missionBoundary ...OR... 2.
 		//which 2 vertices on the missionBoundary
 		//that point1 lies between
-		List<Point2D.Double> missionBoundaryPoints = getPointsOnPath(missionBoundary);
+		//List<Point2D.Double> missionBoundaryPoints = getPointsOnPath(missionBoundary);
 
 		Boolean point1IsVertex = false;
 		int point1MissionBoundaryVertexIndex = -1;
@@ -205,7 +211,8 @@ public class MissionBrain
 					Point2D.Double leftPoint = missionBoundaryPoints.get(x);
 					Point2D.Double rightPoint = missionBoundaryPoints.get(0);
 					Line2D.Double line = new Line2D.Double(leftPoint, rightPoint);
-					if(line.contains(point1))
+					Double pointLineDistance = line.ptLineDist(point1);
+					if(pointLineDistance <= .01)
 					{
 						point1LeftMissionBoundaryVertexIndex = x;
 						point1RightMissionBoundaryVertexIndex = 0;
@@ -218,10 +225,12 @@ public class MissionBrain
 					Point2D.Double leftPoint = missionBoundaryPoints.get(x);
 					Point2D.Double rightPoint = missionBoundaryPoints.get(x+1);
 					Line2D.Double line = new Line2D.Double(leftPoint, rightPoint);
-					if(line.contains(point1))
+					Double pointLineDistance = line.ptLineDist(point1);
+					if(pointLineDistance <= .01)
 					{
 						point1LeftMissionBoundaryVertexIndex = x;
 						point1RightMissionBoundaryVertexIndex = x+1;
+						break;//we've found the line containing this point -- mission accomplished, so proceed
 					}
 				}
 			}
@@ -258,7 +267,8 @@ public class MissionBrain
 					Point2D.Double leftPoint = missionBoundaryPoints.get(x);
 					Point2D.Double rightPoint = missionBoundaryPoints.get(0);
 					Line2D.Double line = new Line2D.Double(leftPoint, rightPoint);
-					if(line.contains(point2))
+					Double pointLineDistance = line.ptLineDist(point2);
+					if(pointLineDistance <= .01)
 					{
 						point2LeftMissionBoundaryVertexIndex = x;
 						point2RightMissionBoundaryVertexIndex = 0;
@@ -271,10 +281,12 @@ public class MissionBrain
 					Point2D.Double leftPoint = missionBoundaryPoints.get(x);
 					Point2D.Double rightPoint = missionBoundaryPoints.get(x+1);
 					Line2D.Double line = new Line2D.Double(leftPoint, rightPoint);
-					if(line.contains(point2))
+					Double pointLineDistance = line.ptLineDist(point2);
+					if(pointLineDistance <= .01)
 					{
 						point2LeftMissionBoundaryVertexIndex = x;
 						point2RightMissionBoundaryVertexIndex = x+1;
+						break; //we've found the line containing this point -- mission accomplished, so proceed
 					}
 				}
 			}
@@ -505,71 +517,87 @@ public class MissionBrain
 				//along the boundary by subtracting
 				//from the point1 index 'till
 				//we reach point2's index
-				int nextIndexLeft = point1LeftMissionBoundaryVertexIndex == 0 ? missionBoundaryPoints.size()-1 : point1LeftMissionBoundaryVertexIndex-1;
-				Point2D.Double previousPoint = missionBoundaryPoints.get(point1LeftMissionBoundaryVertexIndex);
-				leftPathVertices.add(previousPoint);
-				directionLeftDistance += point1.distance(previousPoint);
+				int currentIndexLeft = point1LeftMissionBoundaryVertexIndex;
+				Point2D.Double currentPoint = missionBoundaryPoints.get(point1LeftMissionBoundaryVertexIndex);
+
+				directionLeftDistance += point1.distance(currentPoint);
 				boolean done = false;
+
+				//there's a special case we need to take care of -- when there's only
+				//1 point on the line between point1 and point2 then we
+				//have a situation where point1 and point2 share
+				//a vertex -- this "if" takes care of that
+				if(point1LeftMissionBoundaryVertexIndex == point2LeftMissionBoundaryVertexIndex ||
+						point1LeftMissionBoundaryVertexIndex == point2RightMissionBoundaryVertexIndex)
+				{
+					done = true;
+					leftPathVertices.add(currentPoint);
+					directionLeftDistance += currentPoint.distance(point2);
+				}
+
 				while(!done)
 				{
-					Point2D.Double nextPoint = missionBoundaryPoints.get(nextIndexLeft);
-					leftPathVertices.add(nextPoint);
-					Double previousToNextPointDistance = previousPoint.distance(nextPoint);
-					directionLeftDistance += previousToNextPointDistance;
-					nextIndexLeft = nextIndexLeft == 0 ? missionBoundaryPoints.size()-1 : nextIndexLeft-1;
-					previousPoint = nextPoint;
-
-					if(nextIndexLeft == point2LeftMissionBoundaryVertexIndex ||
-							nextIndexLeft == point2RightMissionBoundaryVertexIndex)
+					leftPathVertices.add(currentPoint);
+					if(currentIndexLeft == point2LeftMissionBoundaryVertexIndex ||
+							currentIndexLeft == point2RightMissionBoundaryVertexIndex)
 					{
-						//Next point would be a vertex of the line containing point2, so we're done
-						//with the loop -- we need to 1. add the distance from previousPoint
-						//to the vertex at nextIndexLeft and 2. then from
-						//the vertex at nextIndexLeft to point2
+						//The next point is a vertex of the line containing point2, so we're done
+						//with the loop -- we need to 1. add the distance from vertex to
+						//point2 and 2. set done=true
 
 						done = true;
-						Point2D.Double leftBoundaryPoint = missionBoundaryPoints.get(nextIndexLeft);
-						directionLeftDistance += nextPoint.distance(leftBoundaryPoint);
-						directionLeftDistance += leftBoundaryPoint.distance(point2);
-
-						//we'll need to add the Point2D.Double at point2LeftMissionBoundaryVertexIndex
-						//to the leftPathVertices
-						leftPathVertices.add(leftBoundaryPoint);
+						directionLeftDistance += currentPoint.distance(point2);
+					}
+					else
+					{
+						currentIndexLeft = currentIndexLeft == 0 ? missionBoundaryPoints.size()-1 : currentIndexLeft-1;
+						Point2D.Double nextBoundaryPoint = missionBoundaryPoints.get(currentIndexLeft);
+						Double currentToNextPointDistance = currentPoint.distance(nextBoundaryPoint);
+						directionLeftDistance += currentToNextPointDistance;
+						currentPoint = nextBoundaryPoint;
 					}
 				}
 
 				//Now find the distance by moving from point1 to point2
 				//by **adding** the vertices' index from point1
 				//'till we reach point2's index
-				int nextIndexRight = point1RightMissionBoundaryVertexIndex == missionBoundaryPoints.size()-1 ? 0 : point1RightMissionBoundaryVertexIndex+1;
-				previousPoint = missionBoundaryPoints.get(point1RightMissionBoundaryVertexIndex);
-				rightPathVertices.add(previousPoint);
-				directionRightDistance += point1.distance(previousPoint);
+
+				int currentIndexRight = point1RightMissionBoundaryVertexIndex;
+				currentPoint = missionBoundaryPoints.get(point1RightMissionBoundaryVertexIndex);
+
+				directionRightDistance = point1.distance(currentPoint);
+
 				done = false;
+
+				if(point1RightMissionBoundaryVertexIndex == point2LeftMissionBoundaryVertexIndex ||
+						point1RightMissionBoundaryVertexIndex == point2RightMissionBoundaryVertexIndex)
+				{
+					done = true;
+					rightPathVertices.add(currentPoint);
+					directionRightDistance += currentPoint.distance(point2);
+				}
+
 				while(!done)
 				{
-					Point2D.Double nextPoint = missionBoundaryPoints.get(nextIndexRight);
-					rightPathVertices.add(nextPoint);
-					Double previousToNextPointDistance = previousPoint.distance(nextPoint);
-					directionRightDistance += previousToNextPointDistance;
-					nextIndexRight = nextIndexRight == missionBoundaryPoints.size()-1 ? 0 : nextIndexRight+1;
-					previousPoint = nextPoint;
+					rightPathVertices.add(currentPoint);
 
-					if(nextIndexRight == point2LeftMissionBoundaryVertexIndex ||
-							nextIndexRight == point2RightMissionBoundaryVertexIndex)
+					if(currentIndexRight == point2LeftMissionBoundaryVertexIndex ||
+							currentIndexRight == point2RightMissionBoundaryVertexIndex)
 					{
-						//Next point would be a vertex of the line containing point2, so we're done
-						//with the loop -- we need to 1. add the distance from previousPoint to
-						//the vertex at nextIndexRight and 2. then add the distance
-						//from the vertex at nextIndexRight to point2
+						//The next point is a vertex of the line containing point2, so we're done
+						//with the loop -- we need to 1. add the distance from vertex to
+						//point2 and 2. set done=true
 
 						done = true;
-						Point2D.Double rightBoundaryPoint = missionBoundaryPoints.get(nextIndexRight);
-						directionRightDistance += nextPoint.distance(rightBoundaryPoint);
-						directionRightDistance += rightBoundaryPoint.distance(point2);
-
-						//we'll also need to add the rightBoundaryPoint to the rightPathVertices
-						rightPathVertices.add(rightBoundaryPoint);
+						directionRightDistance += currentPoint.distance(point2);
+					}
+					else
+					{
+						currentIndexRight = currentIndexRight == missionBoundaryPoints.size()-1 ? 0 : currentIndexRight+1;
+						Point2D.Double nextBoundaryPoint = missionBoundaryPoints.get(currentIndexRight);
+						Double currentToNextPointDistance = currentPoint.distance(nextBoundaryPoint);
+						directionRightDistance += currentToNextPointDistance;
+						currentPoint = nextBoundaryPoint;
 					}
 				}
 			}
@@ -582,42 +610,42 @@ public class MissionBrain
 		{
 			for(int x = 0; x < leftPathVertices.size(); x++)
 			{
-				listOfPointsToAppendThePathTo.add(leftPathVertices.get(x));
+				listOfPointsToAppendThePathTo.add(new Point2D.Double(leftPathVertices.get(x).x, leftPathVertices.get(x).y));
 			}
 		}
 		else
 		{
 			for(int x = 0; x < rightPathVertices.size(); x++)
 			{
-				listOfPointsToAppendThePathTo.add(rightPathVertices.get(x));
+				listOfPointsToAppendThePathTo.add(new Point2D.Double(rightPathVertices.get(x).x, rightPathVertices.get(x).y));
 			}
 		}
 
 		//in this method we assume that the calling code has already added
 		//point1 to the listOfPointsToAppendThePathTo...but,
 		//we do need to add point2 at the end
-		listOfPointsToAppendThePathTo.add(point2);
+		listOfPointsToAppendThePathTo.add(new Point2D.Double(point2.x, point2.y));
 	}
 
-
-	//Credit:
-	//https://github.com/gurkenlabs/litiengine/blob/master/src/de/gurkenlabs/litiengine/util/geom/GeometricUtilities.java
-	public static List<Point2D.Double> getPointsOnPath(final Path2D path)
-	{
-		final PathIterator pi = path.getPathIterator(null);
-		final double[] coordinates = new double[22];
-		final List<Point2D.Double> points = new ArrayList<>();
-		while (!pi.isDone())
-		{
-			pi.next();
-
-			pi.currentSegment(coordinates);
-			final Point2D.Double currentPoint = new Point2D.Double(coordinates[0], coordinates[1]);
-			points.add(currentPoint);
-		}
-
-		return points;
-	}
+// This method is apparently broken
+//	//Credit:
+//	//https://github.com/gurkenlabs/litiengine/blob/master/src/de/gurkenlabs/litiengine/util/geom/GeometricUtilities.java
+//	public static List<Point2D.Double> getPointsOnPath(final Path2D path)
+//	{
+//		final PathIterator pi = path.getPathIterator(null);
+//		final double[] coordinates = new double[22];
+//		final List<Point2D.Double> points = new ArrayList<>();
+//		while (!pi.isDone())
+//		{
+//			pi.next();
+//
+//			pi.currentSegment(coordinates);
+//			final Point2D.Double currentPoint = new Point2D.Double(coordinates[0], coordinates[1]);
+//			points.add(currentPoint);
+//		}
+//
+//		return points;
+//	}
 
     public Point2D.Double polygonEdgePointByFollowingGivenStartingPointAndHeading(
 			Path2D missionBoundary, Point2D.Double start, Double headingRadians)
@@ -820,6 +848,7 @@ public class MissionBrain
 		//baswell begin new fancy look-beyond-boundary logic
 		List<List<Point2D.Double>> additionalPointsOnThisHeading = additionalValidMissionPointsOnTheGivenPointPathAndHeading(
 				missionBoundary,
+				missionBoundaryGPSPositionList,
 				adjustedGuideGPS,
 				headingRadians,
 				minX,
@@ -838,7 +867,7 @@ public class MissionBrain
 			}
 		}
 		//baswell end new fancy look-beyond-boundary logic
-		
+
 		Point2D.Double lastMissionWaypoint = missionWaypoints.get(missionWaypoints.size()-1);
 
     	//The second mission point will always be the guide point adjusted to ensure next turn is within boundary
@@ -848,6 +877,7 @@ public class MissionBrain
 		currentTopPoint = new Point2D.Double(lastMissionWaypoint.x, lastMissionWaypoint.y);
 		Point2D.Double lastTopPoint = new Point2D.Double(currentTopPoint.x, currentTopPoint.y);
 		GPSPosition lastTopGPS = space.gpsPositionGivenDistanceFromZeroZero(lastTopPoint.x, lastTopPoint.y);
+		missionWaypoints.set(missionWaypoints.size()-1, lastTopGPS);//Replace top position with adjusted position
 
 		for(int i = 1; ADD_ANOTHER_PATH_LINE; i++)
 		{
@@ -863,6 +893,7 @@ public class MissionBrain
 
 				List<List<Point2D.Double>> additionalPoints = additionalValidMissionPointsOnTheGivenPointPathAndHeading(
 						missionBoundary,
+						missionBoundaryGPSPositionList,
 						currentBottomPoint,
 						headingRadians+Math.PI,
 						minX,
@@ -873,12 +904,12 @@ public class MissionBrain
 
 				GPSPosition firstLineStopPoint = space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y);
 
-				List<GPSPosition> flattenedPoints = flattenListOfPoint2DListsThenConvertToGPSPositionList(
+				flatPoints = flattenListOfPoint2DListsThenConvertToGPSPositionList(
 						additionalPoints, space);
 
-				if(flattenedPoints.size()> 0)
+				if(flatPoints.size()> 0)
 				{
-					lastMissionWaypoint = missionWaypoints.get(flattenedPoints.size()-1);
+					lastMissionWaypoint = flatPoints.get(flatPoints.size()-1);
 					currentBottomPoint = new Point2D.Double(lastMissionWaypoint.x, lastMissionWaypoint.y);
 				}
 
@@ -938,6 +969,7 @@ public class MissionBrain
 
 				List<List<Point2D.Double>> additionalPoints = additionalValidMissionPointsOnTheGivenPointPathAndHeading(
 						missionBoundary,
+						missionBoundaryGPSPositionList,
 						currentTopPoint,
 						headingRadians,
 						minX,
@@ -948,12 +980,12 @@ public class MissionBrain
 
 				GPSPosition firstLineStopPoint = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
 
-				List<GPSPosition> flattenedPoints = flattenListOfPoint2DListsThenConvertToGPSPositionList(
+				flatPoints = flattenListOfPoint2DListsThenConvertToGPSPositionList(
 						additionalPoints, space);
 
-				if(flattenedPoints.size()> 0)
+				if(flatPoints.size()> 0)
 				{
-					lastMissionWaypoint = missionWaypoints.get(flattenedPoints.size()-1);
+					lastMissionWaypoint = flatPoints.get(flatPoints.size()-1);
 					currentTopPoint = new Point2D.Double(lastMissionWaypoint.x, lastMissionWaypoint.y);
 				}
 
@@ -1195,13 +1227,20 @@ public class MissionBrain
     	return index + "\t0\t3\t16\t0\t0\t0\t0\t" + gps.getLatitude() + "\t" + gps.getLongitude() + "\t100.000000\t1";
     }
 
-    /*
+    /**
      * Returns FALSE if we didn't adjust the line for the next orthogonal point since doing so would have
-     * made the current line's value less than Config.Config.minMowingLineDistanceMeters.  In other words,
-     * if we get back FALSE from this function, it can be assumed that we've reached the end of the mission
-     * and should not build any further lines.
+     * made the current line's value less than Config.minMowingLineDistanceMeters. In other words,
+     * if we get back FALSE from this function, it can be assumed that we've reached
+     * the end of the mission and should not build any further lines.
+	 *
+	 * @param lineStartPoint
+	 * @param lineTurnPoint
+	 * @param normPerp
+	 * @param missionBoundary
      */
-    private Boolean adjustTurnInitiationPointSoThatNextOrthogonalPointIsWithinBoundary(Point2D.Double lineStartPoint, Point2D.Double lineTurnPoint, Point2D.Double normPerp, Path2D missionBoundary)
+    private Boolean adjustTurnInitiationPointSoThatNextOrthogonalPointIsWithinBoundary(
+    		Point2D.Double lineStartPoint, Point2D.Double lineTurnPoint,
+			Point2D.Double normPerp, Path2D missionBoundary)
     {
     	//Next point is the perpendicular norm from lineTurnPoint
     	
