@@ -5,11 +5,9 @@ import com.deepsouthrobotics.data.GPSCartesianCoordinateSpace;
 import com.deepsouthrobotics.data.GPSPosition;
 import com.deepsouthrobotics.util.Geo;
 
-import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +27,25 @@ public class MissionBrain
     {
     }
 
+	/**
+	 * This is the fancy look-ahead logic that takes a given edge in the mission and
+	 * asks (and attempts to answer) the question "are there valid sections
+	 * out in the distance beyond the current boundary?"
+	 *
+	 * @param missionBoundaryPath
+	 * @param missionBoundaryPoints
+	 * @param originalPointPath
+	 * @param headingRadians
+	 * @param minX
+	 * @param maxX
+	 * @param minY
+	 * @param maxY
+	 *
+	 * @return List of Lists that are the additional valid mission points on this heading --
+	 * truth be told, I'm not sure if there's any reason why I'm returning this as
+	 * a List of Lists (i.e. rather than just flattening the guy rather
+	 * than making the calling method do the flattinging)
+	 */
     public List<List<Point2D.Double>> additionalValidMissionPointsOnTheGivenPointPathAndHeading(
 			Path2D.Double missionBoundaryPath,
 			List<GPSPosition> missionBoundaryPoints,
@@ -169,6 +186,42 @@ public class MissionBrain
 		return listOfPointsLists;
 	}
 
+	/**
+	 *
+	 * @param point1 Point to check to see if it's a vertex in mission boundary
+	 * @param missionBoundaryPoints mission boundary list
+	 * @return Vertex index in the missionBoundary list if this point is a
+	 * vertex -- if it's not a vertex, then return -1
+	 */
+	public int pointVertexIndex(Point2D.Double point1, List<? extends Point2D.Double> missionBoundaryPoints)
+	{
+		for(int x = 0; x < missionBoundaryPoints.size(); x++)
+		{
+			if(point1.x == missionBoundaryPoints.get(x).x &&
+					point1.y == missionBoundaryPoints.get(x).y)
+			{
+				return x;
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * Baswell -- this method needs to be updated to address the situation where point1
+	 * or point2 are a vertex (i.e. they are equal to some value in the
+	 * missionBoundaryPoints List) -- that logic is not working
+	 * but I've gotten away with it 'till now as this
+	 * is sortof an edge case I think
+	 *
+	 * @param missionBoundaryPoints
+	 * @param point1 The first point on the edge of the mission that we're looking
+	 *               to chart a path along the mission perimeter from
+	 * @param point2 The second point on the edge of the mission that we're looking
+	 *               to chart a path along the mission perimeter to
+	 * @param listOfPointsToAppendThePathTo After doing the fancy logic to find the
+	 *               shortest perimeter path from point1 to point2, we append
+	 *               the beautiful points of said path to this list
+	 */
 	public void tracePathAlongMissionBoundaryFromOnePointToAnotherPointAddingVerticesOfTheShortestPath(
 			List<GPSPosition> missionBoundaryPoints,
 			Point2D.Double point1,
@@ -627,37 +680,24 @@ public class MissionBrain
 		listOfPointsToAppendThePathTo.add(new Point2D.Double(point2.x, point2.y));
 	}
 
-// This method is apparently broken
-//	//Credit:
-//	//https://github.com/gurkenlabs/litiengine/blob/master/src/de/gurkenlabs/litiengine/util/geom/GeometricUtilities.java
-//	public static List<Point2D.Double> getPointsOnPath(final Path2D path)
-//	{
-//		final PathIterator pi = path.getPathIterator(null);
-//		final double[] coordinates = new double[22];
-//		final List<Point2D.Double> points = new ArrayList<>();
-//		while (!pi.isDone())
-//		{
-//			pi.next();
-//
-//			pi.currentSegment(coordinates);
-//			final Point2D.Double currentPoint = new Point2D.Double(coordinates[0], coordinates[1]);
-//			points.add(currentPoint);
-//		}
-//
-//		return points;
-//	}
-
+	/**
+	 * 	Starting at the start point, move within the missionBoundary path
+	 * 	in the direction specified by headingRadians 1 cm at a time
+	 * 	'till we reach a point outside of missionBoundary
+	 * @param missionBoundary Outer perimeter of our mission
+	 * @param start Point at which to to begin pushing on the given heading
+	 * @param headingRadians Heading (i.e. direction) to push toward in search of boundary
+	 * @return Point at the edge of the missionMoundary beginning at the given
+	 * start point on the given heading
+	 */
     public Point2D.Double polygonEdgePointByFollowingGivenStartingPointAndHeading(
 			Path2D missionBoundary, Point2D.Double start, Double headingRadians)
 	{
-		Double edgeX = start.x;
-		Double edgeY = start.y;
-
-		//Starting at the start point, move within the missionBoundary path
-		//in the direction specified by headingRadians 1 cm at a time
-		//'till we reach a point outside of missionBoundary
 		Double xComponentAdd = Math.cos(headingRadians) * .01;
 		Double yComponentAdd = Math.sin(headingRadians) * .01;
+
+		Double edgeX = start.x + xComponentAdd;
+		Double edgeY = start.y + yComponentAdd;
 
 		while(missionBoundary.contains(edgeX, edgeY))
 		{
@@ -679,12 +719,165 @@ public class MissionBrain
 
 	public void adjustStartingPointIfFirstLineIsTooShort(GPSPosition start,
 														 Path2D missionBoundary,
+														 List<GPSPosition> missionBoundaryGPSPositionList,
 														 Double headingRadians)
 	{
 		Point2D.Double guide = polygonEdgePointByFollowingGivenStartingPointAndHeading(missionBoundary, start, headingRadians);
 		//If line length is too short then adjust the starting location
 		double distance = start.distance(guide);
-		if(distance == 0)
+		if (distance < Config.minMowingLineDistanceMeters)
+		{
+			int pointVertexIndex = pointVertexIndex(start, missionBoundaryGPSPositionList);
+			//if the polygon is at a vertex, we start at the starting point vertex and move
+			//toward the vertex on either side of it, and make a guess based
+			//on the path ahead (as we move toward either vertex)
+
+			if (pointVertexIndex != -1)
+			{
+				int minusVertexIndex; //vertex index to one side of the point
+				int plusVertexIndex; //vertex index to the other side of the point
+
+				if (pointVertexIndex == 0)
+				{
+					minusVertexIndex = missionBoundaryGPSPositionList.size() - 1;
+					plusVertexIndex = 1;
+				} else if (pointVertexIndex == missionBoundaryGPSPositionList.size() - 1)
+				{
+					minusVertexIndex = pointVertexIndex - 1;
+					plusVertexIndex = 0;
+				} else
+				{
+					minusVertexIndex = pointVertexIndex - 1;
+					plusVertexIndex = pointVertexIndex + 1;
+				}
+
+				Point2D.Double minusVertex = missionBoundaryGPSPositionList.get(minusVertexIndex);
+				Point2D.Double plusVertex = missionBoundaryGPSPositionList.get(plusVertexIndex);
+
+				//Now that we know the "minus" and "plus" vertices (i.e. this is what we're calling
+				//the vertices to either side of our point/vertex on the mission boundary) it's
+				//time to move along either of them and see if we can find some fertile
+				//ground
+
+				//Get the point one half meter along the path to either vertex
+				Point2D.Double minusNormHalfMeter = getParallelNorm(start, minusVertex, 0.5);
+				Point2D.Double plusNormHalfMeter = getParallelNorm(start, plusVertex, 0.5);
+
+				Point2D.Double minusNormVenturePoint = new Point2D.Double(
+						start.x + minusNormHalfMeter.x, start.y + minusNormHalfMeter.y);
+
+				Point2D.Double plusNormVenturePoint = new Point2D.Double(
+						start.x + plusNormHalfMeter.x, start.y + plusNormHalfMeter.y);
+
+				Point2D.Double minusNormCentimeter = getParallelNorm(start, minusVertex, 0.01);
+				Point2D.Double plusNormCentimeter = getParallelNorm(start, plusVertex, 0.01);
+
+				//baswell Friday -- taking out this missionBoundary.contains... check because I think we may be getting
+				//some floating point precision issues where the minusNormVenturePoint or plusNormVenturePoint
+				//are a sub-millimeters outside of the missionBoundary -- the method that works off of those
+				//points (polygonEdgePointByFollowingGivenStartingPointAndHeading..) actually adds a
+				//centimeter before beginning it's checks so it should get around this funkiness
+				//(in other words, even though one of the "venture" points is technically
+				//a few micrometers outside of the mission boundary right now,
+				//by the time the polygonEdgePoint method begins checking
+				//them within it's logic it's already added a
+				//centimeter in the direction of the
+				//user-requested heading
+				//if(missionBoundary.contains(minusNormVenturePoint) && missionBoundary.contains(plusNormVenturePoint))
+				//{
+				//the only situation I can think of where the missionBoundary would not contain
+				//both points 1 meter away would be where the distance between a point
+				//and our vertex was less than 1 meter -- let's assume this isn't
+				//a very likely scenario for now
+				Point2D.Double minusNormEndPoint = polygonEdgePointByFollowingGivenStartingPointAndHeading(missionBoundary, minusNormVenturePoint, headingRadians);
+				Point2D.Double plusNormEndPoint = polygonEdgePointByFollowingGivenStartingPointAndHeading(missionBoundary, plusNormVenturePoint, headingRadians);
+
+				Double minusNormDistance = minusNormVenturePoint.distance(minusNormEndPoint);
+				Double plusNormDistance = plusNormVenturePoint.distance(plusNormEndPoint);
+
+				if (plusNormDistance >= minusNormDistance)
+				{
+					//Plus norm was longer, so let's assume this is the point to push toward to
+					//find a good starting point
+					if (plusNormDistance > Config.minMowingLineDistanceMeters)
+					{
+						//Line length is too long, so let's pull the new starting point back toward the original
+						//starting point 'till we get to line length of Config.minMowingLineDistanceMeters
+						boolean adjusted = false;
+						while (plusNormDistance > Config.minMowingLineDistanceMeters)
+						{
+							adjusted = true;
+							plusNormVenturePoint.x -= plusNormCentimeter.x;
+							plusNormVenturePoint.y -= plusNormCentimeter.y;
+							plusNormEndPoint = polygonEdgePointByFollowingGivenStartingPointAndHeading(missionBoundary, plusNormVenturePoint, headingRadians);
+							plusNormDistance = plusNormVenturePoint.distance(plusNormEndPoint);
+						}
+						if (adjusted)
+						{
+							plusNormVenturePoint.x += plusNormCentimeter.x;
+							plusNormVenturePoint.y += plusNormCentimeter.y;
+						}
+						start.x = plusNormVenturePoint.x;
+						start.y = plusNormVenturePoint.y;
+					} else
+					{
+						//Line length is too short, so let's push the new starting point back
+						//toward the plusNormEndPoint 'till we get to line length
+						//of Config.minMowingLineDistanceMeters
+						while (plusNormDistance < Config.minMowingLineDistanceMeters)
+						{
+							plusNormVenturePoint.x += plusNormCentimeter.x;
+							plusNormVenturePoint.y += plusNormCentimeter.y;
+							plusNormEndPoint = polygonEdgePointByFollowingGivenStartingPointAndHeading(missionBoundary, plusNormVenturePoint, headingRadians);
+							plusNormDistance = plusNormVenturePoint.distance(plusNormEndPoint);
+						}
+						start.x = plusNormVenturePoint.x;
+						start.y = plusNormVenturePoint.y;
+					}
+				} else
+				{
+					//Minus norm was longer, so let's assume this is the point to push toward to
+					//find a good starting point
+					if (minusNormDistance > Config.minMowingLineDistanceMeters)
+					{
+						//Line length is too long, so let's pull the new starting point back toward the original
+						//starting point 'till we get to line length of Config.minMowingLineDistanceMeters
+						while (minusNormDistance > Config.minMowingLineDistanceMeters)
+						{
+							minusNormVenturePoint.x -= minusNormCentimeter.x;
+							minusNormVenturePoint.y -= minusNormCentimeter.y;
+							minusNormEndPoint = polygonEdgePointByFollowingGivenStartingPointAndHeading(missionBoundary, minusNormVenturePoint, headingRadians);
+							minusNormDistance = minusNormVenturePoint.distance(minusNormEndPoint);
+						}
+						start.x = minusNormVenturePoint.x;
+						start.y = minusNormVenturePoint.y;
+					} else
+					{
+						//Line length is too short, so let's push the new starting point back
+						//toward the minusNormEndPoint 'till we get to line length
+						//of Config.minMowingLineDistanceMeters
+						while (minusNormDistance < Config.minMowingLineDistanceMeters)
+						{
+							minusNormVenturePoint.x += minusNormCentimeter.x;
+							minusNormVenturePoint.y += minusNormCentimeter.y;
+							minusNormEndPoint = polygonEdgePointByFollowingGivenStartingPointAndHeading(missionBoundary, minusNormVenturePoint, headingRadians);
+							minusNormDistance = minusNormVenturePoint.distance(minusNormEndPoint);
+						}
+						start.x = minusNormVenturePoint.x;
+						start.y = minusNormVenturePoint.y;
+					}
+				}
+			//}
+			//this is the termination of the mission boundary contains check we did above then
+				//commented out for reasons explained above -- it's likely safe
+				//to remove this code by the time anyone reads this
+			//else
+			//{
+			//	System.out.println("Mission boundary didn't contain both minus and plus norms, so you may end up with" +
+			//			" a bizarre mission path");
+			//}
+		}
+		else //the starting point is within the polygon, so the logic to adjust the starting point is slightly different
 		{
 			//Add some x,y value that's perpendicular to the start value --
 			//find the perpendicular value out by adding then subtracting
@@ -692,45 +885,45 @@ public class MissionBrain
 			//value to get x/y components to add to the start
 			//value and seeing if it's within
 			//the missionBoundary
-			Double perpHeading = headingRadians + Math.PI/2;
+			Double perpHeading = headingRadians + Math.PI / 2;
 
 			Double xComponentPerp = Math.cos(perpHeading) * .01;
 			Double yComponentPerp = Math.sin(perpHeading) * .01;
 
-			Point2D.Double perpPoint = new Point2D.Double(start.x+xComponentPerp, start.y+yComponentPerp);
-			if(missionBoundary.contains(perpPoint))
+			Point2D.Double perpPoint = new Point2D.Double(start.x + xComponentPerp, start.y + yComponentPerp);
+			if (missionBoundary.contains(perpPoint))
 			{
 				start.x = perpPoint.x;
 				start.y = perpPoint.y;
-			}
-			else
+			} else
 			{
-				perpPoint = new Point2D.Double(start.x-xComponentPerp, start.y-yComponentPerp);
-				if(missionBoundary.contains(perpPoint))
+				perpPoint = new Point2D.Double(start.x - xComponentPerp, start.y - yComponentPerp);
+				if (missionBoundary.contains(perpPoint))
 				{
 					start.x = perpPoint.x;
 					start.y = perpPoint.y;
-				}
-				else
+				} else
 				{
 					//Well, the perpendicular points on either side of the start line aren't
 					//in the mission polygon so i think something is pretty
 					//jacked up
 				}
 			}
-		}
-		guide = polygonEdgePointByFollowingGivenStartingPointAndHeading(missionBoundary, start, headingRadians);
-		int navigateDirection = directionToNavigateAfterGuideLine(start, guide, missionBoundary);
 
-		while(start.distance(guide) < Config.minMowingLineDistanceMeters)
-		{
-			Point2D.Double normPerpXY = getPerpendicularNorm(start, guide, .01);
-			start.x += normPerpXY.x*navigateDirection;
-			start.y += normPerpXY.y*navigateDirection;
 			guide = polygonEdgePointByFollowingGivenStartingPointAndHeading(missionBoundary, start, headingRadians);
-			Double theDistance = start.distance(guide);
-			System.out.println("Hello friends");
+			int navigateDirection = directionToNavigateAfterGuideLine(start, guide, missionBoundary);
+
+			while (start.distance(guide) < Config.minMowingLineDistanceMeters)
+			{
+				Point2D.Double normPerpXY = getPerpendicularNorm(start, guide, .01);
+				start.x += normPerpXY.x * navigateDirection;
+				start.y += normPerpXY.y * navigateDirection;
+				guide = polygonEdgePointByFollowingGivenStartingPointAndHeading(missionBoundary, start, headingRadians);
+				Double theDistance = start.distance(guide);
+				System.out.println("Hello friends");
+			}
 		}
+	}
 	}
 
 	public List<GPSPosition> flattenListOfPoint2DListsThenConvertToGPSPositionList(
@@ -760,26 +953,29 @@ public class MissionBrain
 	}
 
 	/**
-	  Builds mission waypoints from InputStream
+	 * One of the main methods that orchestrates a lot of the heavy lifting for building out
+	 * the mission waypoints
+	 *
+	 * @param missionBoundaryGPSPositionList
+	 * @param mowingPathWidthInMeters
+	 * @param headingDegrees
+	 * @param startGPSPosition
+	 * @return
 	 */
-    public List<GPSPosition> buildMissionWaypointsFromInputStream(List<GPSPosition> missionBoundaryGPSPositionList,
+    public List<GPSPosition> buildMissionWaypoints(List<GPSPosition> missionBoundaryGPSPositionList,
 															   Double mowingPathWidthInMeters,
 															   Double headingDegrees,
 															   GPSPosition startGPSPosition)
     {
 		Double[] minXandMinY = scaleMinXAndMinYToZero(missionBoundaryGPSPositionList);
 
-		//If the startGPSPosition is not the first element in the missionBoundaryGPSPositionList then
-		//that means that we didn't scale the Min X and Min Y values in the method call
-		//above -- just for the record, the scenario where startGPSPosition wouldn't
-		//be the first element in the list is where startGPSPosition is where
+		//Just for the record, the scenario where startGPSPosition wouldn't be the
+		//first element in the list is where startGPSPosition is where
 		//the user has dragged the start marker inside the
 		//missionBoundaryGPSPositionList polygon
-		if(startGPSPosition.compareTo(missionBoundaryGPSPositionList.get(0)) != 0)
-		{
-			startGPSPosition.x -= minXandMinY[0];
-			startGPSPosition.y -= minXandMinY[1];
-		}
+
+		startGPSPosition.x -= minXandMinY[0];
+		startGPSPosition.y -= minXandMinY[1];
 
 		//Go ahead and pull the min x, max x, min y and max y values --
 		//we'll use these to hopefully save a few cpu
@@ -801,7 +997,7 @@ public class MissionBrain
 		Double headingRadians = Math.toRadians(headingDegrees);
         Path2D.Double missionBoundary = missionBoundary(missionBoundaryGPSPositionList);
 
-		adjustStartingPointIfFirstLineIsTooShort(startGPSPosition, missionBoundary, headingRadians);
+		adjustStartingPointIfFirstLineIsTooShort(startGPSPosition, missionBoundary, missionBoundaryGPSPositionList, headingRadians);
 		startGPSPosition = space.gpsPositionGivenDistanceFromZeroZero(startGPSPosition.x, startGPSPosition.y);
 
 		//Build a "guidepoint" to shoe-horn into our old code/logic --
@@ -1116,9 +1312,14 @@ public class MissionBrain
 		//other words we'll begin building the
 		//mission at that vertex
 
+		//Just to have somewhere to start, let's call the (x,y) coordinate of
+		//our startGPSPositionUnchecked point (0,0)
 		startGPSPositionUnchecked.x = 0;
 		startGPSPositionUnchecked.y = 0;
 
+		//In this loop we find the distance from the startGPSPositionUnchecked to every vertex
+		//on the mission boundary and we set the (x,y) coordinates of those points
+		//as their (x,y) distance from startGPSPositionUnchecked
 		for(int x = 0; x < missionBoundaryGPSPositionList.size(); x++)
 		{
 			setXLatandYLngMetersByDiffingLatAndLonDistanceFromGPSPosition(
@@ -1127,15 +1328,30 @@ public class MissionBrain
 
 		GPSPosition startGPSPosition = getClosestPolygonVertexIfPointNotWithinPolygon(startGPSPositionUnchecked, missionBoundaryGPSPositionList);
 
-		//If startGPSPosition is one of the mission boundary polygon vertices,
-		//this moves it to the beginning of the list
-		moveStartGPSPositionToBeginningOfList(missionBoundaryGPSPositionList, startGPSPosition);
-		startGPSPosition.x = 0;
-		startGPSPosition.y = 0;
-
-		for(int x = 1; x < missionBoundaryGPSPositionList.size(); x++)
+		//If the start point wasn't within the mission boundary polygon (and we thus
+		//obtained a startGPSPosition point that's equal to the closest
+		//vertex to startGPSPositionUnchecked), then we'll rearrange
+		//the mission boundary list to put that vertex at the
+		//beginning and then we'll call that vertex (0,0)
+		//and set the (x,y) coordinates of the other
+		//vertices as their distance from the
+		//startGPSPosition vertex -- at
+		//some point there was a reason
+		//for this logic but I'm really
+		//not sure if it's still needed
+		if(startGPSPosition.compareTo(startGPSPositionUnchecked) != 0)
 		{
-			setXLatandYLngMetersByDiffingLatAndLonDistanceFromGPSPosition(startGPSPosition, missionBoundaryGPSPositionList.get(x));
+			//If startGPSPosition is one of the mission boundary polygon vertices,
+			//this moves it to the beginning of the list
+			moveStartGPSPositionToBeginningOfList(missionBoundaryGPSPositionList, startGPSPosition);
+
+			startGPSPosition.x = missionBoundaryGPSPositionList.get(0).x = 0;
+			startGPSPosition.y = missionBoundaryGPSPositionList.get(0).y = 0;
+
+			for(int x = 1; x < missionBoundaryGPSPositionList.size(); x++)
+			{
+				setXLatandYLngMetersByDiffingLatAndLonDistanceFromGPSPosition(startGPSPosition, missionBoundaryGPSPositionList.get(x));
+			}
 		}
 
 		//Note that we've gotta have at least 3 coordinates in order for any of
@@ -1143,7 +1359,7 @@ public class MissionBrain
 		//then you've got a line, which doesn't have area and
 		//won't contain waypoints by definition)
 
-		List<GPSPosition> waypoints = this.buildMissionWaypointsFromInputStream(
+		List<GPSPosition> waypoints = this.buildMissionWaypoints(
 				missionBoundaryGPSPositionList, mowingPathWidthInMeters, heading, startGPSPosition);
 
 		System.out.println("Now we've built those beautiful cartesian positions...");
@@ -1186,13 +1402,13 @@ public class MissionBrain
 	 */
 	public GPSPosition getClosestPolygonVertexIfPointNotWithinPolygon(GPSPosition startPointUnchecked, List<GPSPosition> gpsPositionList)
 	{
-		//Build a missionBoundaryPath2D for easy x,y point containment checking
+		//Build a missionBoundaryPath2D for easy (x,y) point containment checking
 		Path2D missionBoundaryPath2D = missionBoundary(gpsPositionList);
 		if(missionBoundaryPath2D.contains(startPointUnchecked.x, startPointUnchecked.y))
 		{
 			//startPointUnchecked is within the mission boundary, so we can simply send
 			//it back to the user as the starting point
-			return startPointUnchecked;
+			return (GPSPosition)startPointUnchecked.clone();
 		}
 		else
 		{
@@ -1210,7 +1426,7 @@ public class MissionBrain
 					closestVertex = gpsPositionList.get(x);
 				}
 			}
-			return closestVertex;
+			return (GPSPosition)closestVertex.clone();
 		}
 	}
 
@@ -1510,18 +1726,5 @@ public class MissionBrain
     	}
 
     	return new Double[] {minX, minY};
-    }
-    
-    private void fileWriterSilentClose(FileWriter writer)
-    {
-        try
-        {
-            writer.flush();
-            writer.close();
-        }
-        catch (Exception ex)
-        {
-            System.out.println(ex.toString());
-        }
     }
 }

@@ -9,6 +9,8 @@
     <list default="true" id="4ebd860c-fda2-4371-bd95-20e7bd2b0f63" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/data/GPSPosition.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/data/GPSPosition.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/util/Geo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/util/Geo.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -234,7 +236,7 @@
       <workItem from="1561578935735" duration="19163000" />
       <workItem from="1568107932272" duration="126272000" />
       <workItem from="1569440007455" duration="1963000" />
-      <workItem from="1569449849797" duration="83804000" />
+      <workItem from="1569449849797" duration="115327000" />
     </task>
     <servers />
   </component>
@@ -259,73 +261,98 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>182</line>
+          <line>236</line>
           <option name="timeStamp" value="62" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>634</line>
-          <option name="timeStamp" value="69" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>646</line>
-          <option name="timeStamp" value="70" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>639</line>
-          <option name="timeStamp" value="71" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>641</line>
-          <option name="timeStamp" value="72" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>210</line>
+          <line>264</line>
           <option name="timeStamp" value="76" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>270</line>
+          <line>324</line>
           <option name="timeStamp" value="78" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>798</line>
-          <option name="timeStamp" value="94" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>316</line>
+          <line>370</line>
           <option name="timeStamp" value="96" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>870</line>
+          <line>1067</line>
           <option name="timeStamp" value="97" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>42</line>
-          <option name="timeStamp" value="125" />
+          <line>1000</line>
+          <option name="timeStamp" value="130" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>117</line>
-          <option name="timeStamp" value="126" />
+          <line>820</line>
+          <option name="timeStamp" value="131" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>125</line>
-          <option name="timeStamp" value="127" />
+          <line>1001</line>
+          <option name="timeStamp" value="132" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>155</line>
-          <option name="timeStamp" value="128" />
+          <line>970</line>
+          <option name="timeStamp" value="134" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>1317</line>
+          <option name="timeStamp" value="138" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>1362</line>
+          <option name="timeStamp" value="139" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>977</line>
+          <option name="timeStamp" value="140" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>1329</line>
+          <option name="timeStamp" value="143" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>1429</line>
+          <option name="timeStamp" value="144" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>1346</line>
+          <option name="timeStamp" value="145" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>772</line>
+          <option name="timeStamp" value="146" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>786</line>
+          <option name="timeStamp" value="147" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>730</line>
+          <option name="timeStamp" value="148" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
+          <line>792</line>
+          <option name="timeStamp" value="149" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

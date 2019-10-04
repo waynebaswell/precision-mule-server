@@ -82,7 +82,7 @@ public class Geo
 		//
 		double long107x = gpsLoc.longitude*1.0e+7;
 		double lat107x = gpsLoc.latitude*1.0e+7;
-		GPSPosition loc = new GPSPosition(lat107x, long107x, gpsLoc.fixType);
+		GPSPosition loc = new GPSPosition(lat107x, long107x);
 		
 	    if (!(X_ofs_north == 0.0) || !(Y_ofs_east == 0.0)) 
 	    {
