@@ -3,6 +3,7 @@ package com.deepsouthrobotics.brain;
 import com.deepsouthrobotics.data.Config;
 import com.deepsouthrobotics.data.GPSCartesianCoordinateSpace;
 import com.deepsouthrobotics.data.GPSPosition;
+import com.deepsouthrobotics.data.GPSPositionArea;
 import com.deepsouthrobotics.util.Geo;
 
 import java.awt.geom.Line2D;
@@ -952,6 +953,161 @@ public class MissionBrain
 		return gpsPoints;
 	}
 
+
+	public void circumventObstaclesBetweenTwoPointsAndAddTheGeneratedPointsToTheMission(
+								GPSCartesianCoordinateSpace space,
+								List<GPSPosition> missionWaypoints,
+								GPSPosition startGPSPosition,
+								GPSPosition endGPSPosition,
+								Path2D.Double missionBoundary,
+								List<GPSPositionArea> polyObstaclesGPSPositionAreaList)
+	{
+		//Get a list of the obstacles intersected by the line formed
+		//by startGPSPosition and endGPSPosition
+		List<GPSPositionArea> intersectedObstacles = obstaclesThatLineIntersects(
+				startGPSPosition, endGPSPosition, polyObstaclesGPSPositionAreaList);
+		if(intersectedObstacles.size() > 0)
+		{
+			//If we get here we know that the line formed by startGPSPosition
+			//and endGPSPosition intersects at least 1 obstacle
+			Point2D.Double normMeter = getParallelNorm(startGPSPosition, endGPSPosition, 1.0);
+			Point2D.Double normCM = getParallelNorm(startGPSPosition, endGPSPosition, 1.0);
+
+			Double startToEndDistance = startGPSPosition.distance(endGPSPosition);
+
+			Point2D.Double flexibleVenturePoint = new Point2D.Double(startGPSPosition.x, startGPSPosition.y);
+
+			//We do this check on the distance between our starting point and the
+			//flexibleVenturePoint to see if we've pushed
+			//beyond the endGPSPosition
+			while(startGPSPosition.distance(flexibleVenturePoint) < startToEndDistance)
+			{
+				for(int x = 0; x < intersectedObstacles.size(); x++)
+				{
+					GPSPositionArea obstacle = intersectedObstacles.get(x);
+					if(obstacle.contains(flexibleVenturePoint))
+					{
+						//High level steps of what we're trying to do:
+						//
+						//if the obstacle contains the venture point we want to:
+						//
+						//1. Back up the start point of flexibleVenturePoint to the beginning of the obstacle and record that value
+						//2. Push flexibleVenturePoint 'till it's outside of obstacle and record the endpoint
+						//3. Build the route the start and end point based on the shortest path following the obstacle perimeter
+						//4. Record those points we generated in 1-3 above to missionWaypoints
+						//5. Somehow flexibleVenturePoint 1cm beyond the end point of the current obstacle so that the next iteration of this while loop is ready
+
+						Point2D.Double obstacleStartPoint = new Point2D.Double(flexibleVenturePoint.x, flexibleVenturePoint.y);
+						do
+						{
+							obstacleStartPoint.x -= normCM.x;
+							obstacleStartPoint.y -= normCM.y;
+						}
+						while(obstacle.contains(obstacleStartPoint));
+
+						obstacleStartPoint.x += normCM.x;
+						obstacleStartPoint.y += normCM.y;
+
+						//obstacleStartPoint is the point on the edge of the obstacle where we'll start
+
+						Point2D.Double obstacleEndPoint = new Point2D.Double(flexibleVenturePoint.x, flexibleVenturePoint.y);
+						do
+						{
+							obstacleEndPoint.x += normCM.x;
+							obstacleEndPoint.y += normCM.y;
+						}
+						while(obstacle.contains(obstacleEndPoint));
+
+						obstacleEndPoint.x -= normCM.x;
+						obstacleEndPoint.y -= normCM.y;
+
+						//obstacleEndPoint is the point on the edge of the obstacle where we'll end the avoidance dance
+
+						//Now we need to build the shortest path between obstacleStartPoint and obstacleEndPoint
+						//by following the perimeter either way and returning
+						//the points of the shortest path
+						List<Point2D.Double> pointsAroundObstacle = new ArrayList<>();
+						pointsAroundObstacle.add(new Point2D.Double(obstacleStartPoint.x, obstacleStartPoint.y));
+						tracePathAlongMissionBoundaryFromOnePointToAnotherPointAddingVerticesOfTheShortestPath(
+								obstacle.positions,
+								obstacleStartPoint,
+								obstacleEndPoint,
+								pointsAroundObstacle
+						);
+
+						//Now convert the pointsAroundObstacle list to GPSPosition objects and
+						//append to the missionWaypoints list
+						for(int y = 0; y < pointsAroundObstacle.size(); y++ )
+						{
+							Point2D.Double point = pointsAroundObstacle.get(y);
+							missionWaypoints.add(space.gpsPositionGivenDistanceFromZeroZero(point.x, point.y));
+						}
+
+						//push flexibleVenturePoint to 1cm beyond obstacleEndPoint
+						flexibleVenturePoint.x = obstacleEndPoint.x + normCM.x;
+						flexibleVenturePoint.y = obstacleEndPoint.y + normCM.y;
+
+						//baswell after lunch/shop break -- I think we're ready to test this baby
+						break;
+					}
+					else
+					{
+						if(x == (intersectedObstacles.size() - 1))
+						{
+							//At this point we know that this point isn't within
+							//any obstacles to let's add a meter to
+							//the flexibleVenturePoint and keep
+							//looping (i.e. looking for
+							//points within obstacles)
+							flexibleVenturePoint.x += normMeter.x;
+							flexibleVenturePoint.y += normMeter.y;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public List<GPSPositionArea> obstaclesThatLineIntersects(
+								GPSPosition startGPSPosition,
+								GPSPosition endGPSPosition,
+								List<GPSPositionArea> polyObstaclesGPSPositionAreaList
+	)
+	{
+		List<GPSPositionArea> intersectedPolyObstaclesGPSPositionAreaList = new ArrayList<>();
+
+		for (GPSPositionArea obstacleGPSPositionArea : polyObstaclesGPSPositionAreaList)
+		{
+			for(int x = 0; x < obstacleGPSPositionArea.positions.size(); x++)
+			{
+				GPSPosition obstacleLineStart = obstacleGPSPositionArea.positions.get(x);
+				GPSPosition obstacleLineEnd;
+				if(x == (obstacleGPSPositionArea.positions.size() - 1 ))
+				{
+					//This is the end of the list, so we check if the
+					//line intersects the line between this
+					//position and the position at the
+					//beginning of the list
+					obstacleLineEnd = obstacleGPSPositionArea.positions.get(0);
+				}
+				else
+				{
+					obstacleLineEnd = obstacleGPSPositionArea.positions.get(x+1);
+				}
+				Line2D.Double obstacleLine = new Line2D.Double(obstacleLineStart.x, obstacleLineStart.y, obstacleLineEnd.x, obstacleLineEnd.y);
+				Line2D.Double pathLine = new Line2D.Double(startGPSPosition.x, startGPSPosition.y, endGPSPosition.x, endGPSPosition.y);
+				if(obstacleLine.intersectsLine(pathLine))
+				{
+					intersectedPolyObstaclesGPSPositionAreaList.add(obstacleGPSPositionArea);
+					break;
+				}
+			}
+		}
+
+		return intersectedPolyObstaclesGPSPositionAreaList;
+	}
+
+
 	/**
 	 * One of the main methods that orchestrates a lot of the heavy lifting for building out
 	 * the mission waypoints
@@ -965,10 +1121,18 @@ public class MissionBrain
     public List<GPSPosition> buildMissionWaypoints(List<GPSPosition> missionBoundaryGPSPositionList,
 															   Double mowingPathWidthInMeters,
 															   Double headingDegrees,
-															   GPSPosition startGPSPosition)
+															   GPSPosition startGPSPosition,
+												               List<List<GPSPosition>> polyObstaclesGPSPositionList)
     {
-		Double[] minXandMinY = scaleMinXAndMinYToZero(missionBoundaryGPSPositionList);
+		Double[] minXandMinY = scaleMinXAndMinYToZero(missionBoundaryGPSPositionList, polyObstaclesGPSPositionList);
 
+		//Convert the list of obstacle points into a form we'll use later
+		List<GPSPositionArea> polyObstaclesGPSPositionAreaList = new ArrayList<>();
+		for(List<GPSPosition> polyObstaclesGPSPositions : polyObstaclesGPSPositionList)
+		{
+			GPSPositionArea gpsPositionArea = new GPSPositionArea(polyObstaclesGPSPositions);
+			polyObstaclesGPSPositionAreaList.add(gpsPositionArea);
+		}
 		//Just for the record, the scenario where startGPSPosition wouldn't be the
 		//first element in the list is where startGPSPosition is where
 		//the user has dragged the start marker inside the
@@ -1004,6 +1168,7 @@ public class MissionBrain
 		//the guidepoint is the endpoint of our first mission line --
 		//in other words, it's the second waypoint in our mission (i.e.
 		//the startGPSPosition is the first waypoint)
+		//baswell remove Monday
 		Point2D.Double guide = polygonEdgePointByFollowingGivenStartingPointAndHeading(missionBoundary, startGPSPosition, headingRadians);
 
     	List<GPSPosition> missionWaypoints = new ArrayList<>();
@@ -1018,8 +1183,8 @@ public class MissionBrain
     	
     	//We use the parallel norm for pushing/pulling the mission line
     	Point2D.Double normParallel = getParallelNorm(startGPSPosition, guide, Config.boundaryPushAdjustmentMeters);
-    	normParallel.x *= -1;//navigateDirection;
-    	normParallel.y *= -1;//navigateDirection;
+    	normParallel.x *= -1;
+    	normParallel.y *= -1;
     	
     	//Convenient way to push/pull the mission line opposite direction of above
     	Point2D.Double normParallelNegative = new Point2D.Double();
@@ -1122,8 +1287,17 @@ public class MissionBrain
 					
 					if(Math.abs(currentTopPoint.distance(currentBottomPoint)) >= Config.minMowingLineDistanceMeters)
 					{
-						GPSPosition newBottomGPS = space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y);
+						//baswell -- begin Add check for obstacles between newTopGPS and firstLineStopPoint
+						circumventObstaclesBetweenTwoPointsAndAddTheGeneratedPointsToTheMission(
+								space,
+								missionWaypoints,
+								newTopGPS,
+								firstLineStopPoint,
+								missionBoundary,
+								polyObstaclesGPSPositionAreaList);
+						//baswell -- end Add check for obstacles between newTopGPS and firstLineStopPoint
 						missionWaypoints.add(firstLineStopPoint);
+
 
 						if(flatPoints.size() > 0)
 						{
@@ -1136,9 +1310,9 @@ public class MissionBrain
 						//up in the adjustTurnInitiationPoint... method above we do some karate on the last
 						//point (i.e. currentBottomPoint) -- so we want add the karateified point
 						//to the missionWaypoints list
-						missionWaypoints.add(space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y));
 
-						lastBottomGPS = newBottomGPS;
+						missionWaypoints.add(space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y));
+						lastBottomGPS = space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y);
 					}
 					else
 					{
@@ -1350,7 +1524,28 @@ public class MissionBrain
 
 			for(int x = 1; x < missionBoundaryGPSPositionList.size(); x++)
 			{
-				setXLatandYLngMetersByDiffingLatAndLonDistanceFromGPSPosition(startGPSPosition, missionBoundaryGPSPositionList.get(x));
+				setXLatandYLngMetersByDiffingLatAndLonDistanceFromGPSPosition(
+						startGPSPosition, missionBoundaryGPSPositionList.get(x));
+			}
+
+			for(List<GPSPosition> obstacleGPSPositionList: polyObstaclesGPSPositionList)
+			{
+				for(int x = 0; x < obstacleGPSPositionList.size(); x++)
+				{
+					setXLatandYLngMetersByDiffingLatAndLonDistanceFromGPSPosition(
+							startGPSPosition, obstacleGPSPositionList.get(x));
+				}
+			}
+		}
+		else
+		{
+			for(List<GPSPosition> obstacleGPSPositionList: polyObstaclesGPSPositionList)
+			{
+				for(int x = 0; x < obstacleGPSPositionList.size(); x++)
+				{
+					setXLatandYLngMetersByDiffingLatAndLonDistanceFromGPSPosition(
+							startGPSPositionUnchecked, obstacleGPSPositionList.get(x));
+				}
 			}
 		}
 
@@ -1360,7 +1555,8 @@ public class MissionBrain
 		//won't contain waypoints by definition)
 
 		List<GPSPosition> waypoints = this.buildMissionWaypoints(
-				missionBoundaryGPSPositionList, mowingPathWidthInMeters, heading, startGPSPosition);
+				missionBoundaryGPSPositionList, mowingPathWidthInMeters, heading,
+				startGPSPosition, polyObstaclesGPSPositionList);
 
 		System.out.println("Now we've built those beautiful cartesian positions...");
 		return waypoints;
@@ -1714,7 +1910,7 @@ public class MissionBrain
     
     //Adjust Cartesian coordinates so that they all fall in the positive space
     //This is helpful for testing -- specifically graphing in java 
-    public Double[] scaleMinXAndMinYToZero(List<GPSPosition> missionBoundaryGPSPositionList)
+    public Double[] scaleMinXAndMinYToZero(List<GPSPosition> missionBoundaryGPSPositionList, List<List<GPSPosition>> polyObstaclesGPSPositionList)
     {
     	Double minX = getMinX(missionBoundaryGPSPositionList);
     	Double minY = getMinY(missionBoundaryGPSPositionList);
@@ -1724,6 +1920,15 @@ public class MissionBrain
 			p.x -= minX;
 			p.y -= minY;
     	}
+
+		for(List<GPSPosition> obstacleGPSPositionList: polyObstaclesGPSPositionList)
+		{
+			for(GPSPosition p : obstacleGPSPositionList)
+			{
+				p.x -= minX;
+				p.y -= minY;
+			}
+		}
 
     	return new Double[] {minX, minY};
     }
