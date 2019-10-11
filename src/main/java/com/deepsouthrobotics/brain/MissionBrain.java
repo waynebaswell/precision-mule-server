@@ -1287,45 +1287,34 @@ public class MissionBrain
 
 				ADD_ANOTHER_PATH_LINE = adjustTurnInitiationPointSoThatNextOrthogonalPointIsWithinBoundary(currentTopPoint, currentBottomPoint, normPerpXY, missionBoundary);
 
-				if(ADD_ANOTHER_PATH_LINE)
+				GPSPosition newTopGPS = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
+				missionWaypoints.add(newTopGPS);
+				System.out.println(i+"Top "+ newTopGPS.latitude + " " + newTopGPS.longitude + " Distance: " + geo.latLongDistance(lastTopGPS.latitude, lastTopGPS.longitude, newTopGPS.latitude, newTopGPS.longitude));
+				lastTopGPS = newTopGPS;
+
+				if(Math.abs(currentTopPoint.distance(currentBottomPoint)) >= Config.minMowingLineDistanceMeters)
 				{
-					GPSPosition newTopGPS = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
-					missionWaypoints.add(newTopGPS);
-					System.out.println(i+"Top "+ newTopGPS.latitude + " " + newTopGPS.longitude + " Distance: " + geo.latLongDistance(lastTopGPS.latitude, lastTopGPS.longitude, newTopGPS.latitude, newTopGPS.longitude));
-					lastTopGPS = newTopGPS;
-					
-					if(Math.abs(currentTopPoint.distance(currentBottomPoint)) >= Config.minMowingLineDistanceMeters)
+					//baswell -- begin Add check for obstacles between newTopGPS and firstLineStopPoint
+					circumventObstaclesBetweenTwoPointsAndAddTheGeneratedPointsToTheMission(
+							space,
+							missionWaypoints,
+							newTopGPS,
+							firstLineStopPoint,
+							polyObstaclesGPSPositionAreaList);
+					//baswell -- end Add check for obstacles between newTopGPS and firstLineStopPoint
+
+					missionWaypoints.add(firstLineStopPoint);
+
+					if(flatPoints.size() > 0)
 					{
-						//baswell -- begin Add check for obstacles between newTopGPS and firstLineStopPoint
-						circumventObstaclesBetweenTwoPointsAndAddTheGeneratedPointsToTheMission(
-								space,
-								missionWaypoints,
-								newTopGPS,
-								firstLineStopPoint,
-								polyObstaclesGPSPositionAreaList);
-						//baswell -- end Add check for obstacles between newTopGPS and firstLineStopPoint
-
-						missionWaypoints.add(firstLineStopPoint);
-
-						if(flatPoints.size() > 0)
+						for(int x = 0; x < flatPoints.size()-1; x++)
 						{
-							for(int x = 0; x < flatPoints.size()-1; x++)
-							{
-								missionWaypoints.add(flatPoints.get(x));
-							}
+							missionWaypoints.add(flatPoints.get(x));
 						}
-
-						//up in the adjustTurnInitiationPoint... method above we do some karate on the last
-						//point (i.e. currentBottomPoint) -- so we want add the karateified point
-						//to the missionWaypoints list
-
 						missionWaypoints.add(space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y));
-						lastBottomGPS = space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y);
 					}
-					else
-					{
-						ADD_ANOTHER_PATH_LINE = false;
-					}
+
+					lastBottomGPS = space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y);
 				}
 					
 				lastTopPoint.x = currentTopPoint.x;
@@ -1369,45 +1358,39 @@ public class MissionBrain
 				}
 
 				ADD_ANOTHER_PATH_LINE = adjustTurnInitiationPointSoThatNextOrthogonalPointIsWithinBoundary(currentBottomPoint, currentTopPoint, normPerpXY, missionBoundary);
-				
-				if(ADD_ANOTHER_PATH_LINE)
+
+				GPSPosition newBottomGPS = space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y);
+				missionWaypoints.add(newBottomGPS);
+				System.out.println(i+"Bottom lat:"+ newBottomGPS.latitude + " lon:" + newBottomGPS.longitude + " x: " + newBottomGPS.x + " y:" + newBottomGPS.y +" Distance: " + geo.latLongDistance(lastBottomGPS.latitude, lastBottomGPS.longitude, newBottomGPS.latitude, newBottomGPS.longitude));
+				lastBottomGPS = newBottomGPS;
+
+				if(Math.abs(currentTopPoint.distance(currentBottomPoint)) >= Config.minMowingLineDistanceMeters)
 				{
-					GPSPosition newBottomGPS = space.gpsPositionGivenDistanceFromZeroZero(currentBottomPoint.x, currentBottomPoint.y);
-					missionWaypoints.add(newBottomGPS);
-					System.out.println(i+"Bottom lat:"+ newBottomGPS.latitude + " lon:" + newBottomGPS.longitude + " x: " + newBottomGPS.x + " y:" + newBottomGPS.y +" Distance: " + geo.latLongDistance(lastBottomGPS.latitude, lastBottomGPS.longitude, newBottomGPS.latitude, newBottomGPS.longitude));
-					lastBottomGPS = newBottomGPS;
-					
-					if(Math.abs(currentTopPoint.distance(currentBottomPoint)) >= Config.minMowingLineDistanceMeters)
+					//baswell -- begin Add check for obstacles between newBottomGPS and firstLineStopPoint
+					circumventObstaclesBetweenTwoPointsAndAddTheGeneratedPointsToTheMission(
+							space,
+							missionWaypoints,
+							newBottomGPS,
+							firstLineStopPoint,
+							polyObstaclesGPSPositionAreaList);
+					//baswell -- end Add check for obstacles between newTopGPS and firstLineStopPoint
+
+					missionWaypoints.add(firstLineStopPoint);
+
+					if(flatPoints.size() > 0)
 					{
-						//baswell -- begin Add check for obstacles between newBottomGPS and firstLineStopPoint
-						circumventObstaclesBetweenTwoPointsAndAddTheGeneratedPointsToTheMission(
-								space,
-								missionWaypoints,
-								newBottomGPS,
-								firstLineStopPoint,
-								polyObstaclesGPSPositionAreaList);
-						//baswell -- end Add check for obstacles between newTopGPS and firstLineStopPoint
-
-						missionWaypoints.add(firstLineStopPoint);
-
-						if(flatPoints.size() > 0)
+						for(int x = 0; x < flatPoints.size()-1; x++)
 						{
-							for(int x = 0; x < flatPoints.size()-1; x++)
-							{
-								missionWaypoints.add(flatPoints.get(x));
-							}
+							missionWaypoints.add(flatPoints.get(x));
 						}
-
-						//up in the adjustTurnInitiationPoint... method above we do some karate on the last
-						//point (i.e. currentTopPoint) -- so we want add the karateified point
-						//to the missionWaypoints list
 						missionWaypoints.add(space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y));
-						lastTopGPS = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
 					}
-					else
-					{
-						ADD_ANOTHER_PATH_LINE = false;
-					}
+
+					//up in the adjustTurnInitiationPoint... method above we do some karate on the last
+					//point (i.e. currentTopPoint) -- so we want add the karateified point
+					//to the missionWaypoints list
+					//missionWaypoints.add(space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y));
+					lastTopGPS = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
 				}
 				
 				lastTopPoint.x = currentTopPoint.x;

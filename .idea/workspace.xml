@@ -8,7 +8,6 @@
   <component name="ChangeListManager">
     <list default="true" id="4ebd860c-fda2-4371-bd95-20e7bd2b0f63" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/api/BuildMissionFromLatLngPoints.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/api/BuildMissionFromLatLngPoints.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -235,7 +234,7 @@
       <workItem from="1561578935735" duration="19163000" />
       <workItem from="1568107932272" duration="126272000" />
       <workItem from="1569440007455" duration="1963000" />
-      <workItem from="1569449849797" duration="160524000" />
+      <workItem from="1569449849797" duration="164209000" />
     </task>
     <servers />
   </component>
@@ -277,11 +276,6 @@
           <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
           <line>795</line>
           <option name="timeStamp" value="147" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/deepsouthrobotics/brain/MissionBrain.java</url>
-          <line>146</line>
-          <option name="timeStamp" value="163" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
