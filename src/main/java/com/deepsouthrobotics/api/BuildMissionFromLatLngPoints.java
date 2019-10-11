@@ -129,7 +129,7 @@ public class BuildMissionFromLatLngPoints
             List<GPSPosition> polyObstacleGPSPositionList = new ArrayList<GPSPosition>();
             for(int y = 0; y < polyObstacleJSONList.length(); y++)
             {
-                JSONObject latLngJsonObj = polyObstacleJSONList.getJSONObject(x);
+                JSONObject latLngJsonObj = polyObstacleJSONList.getJSONObject(y);
                 polyObstacleGPSPositionList.add(new GPSPosition(latLngJsonObj.getDouble("lat"), latLngJsonObj.getDouble("lng")));
             }
             listOfGPSPolygonLists.add(polyObstacleGPSPositionList);

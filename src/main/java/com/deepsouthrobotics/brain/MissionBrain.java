@@ -34,7 +34,6 @@ public class MissionBrain
 	 * out in the distance beyond the current boundary?"
 	 *
 	 * @param missionBoundaryPath
-	 * @param missionBoundaryPoints
 	 * @param originalPointPath
 	 * @param headingRadians
 	 * @param minX
@@ -45,11 +44,12 @@ public class MissionBrain
 	 * @return List of Lists that are the additional valid mission points on this heading --
 	 * truth be told, I'm not sure if there's any reason why I'm returning this as
 	 * a List of Lists (i.e. rather than just flattening the guy rather
-	 * than making the calling method do the flattinging)
+	 * than making the calling method do the flattening)
 	 */
     public List<List<Point2D.Double>> additionalValidMissionPointsOnTheGivenPointPathAndHeading(
-			Path2D.Double missionBoundaryPath,
-			List<GPSPosition> missionBoundaryPoints,
+			GPSCartesianCoordinateSpace space,
+			GPSPositionArea missionBoundaryPath,
+			List<GPSPositionArea> polyObstaclesGPSPositionAreaList,
 			Point2D.Double originalPointPath,
 			Double headingRadians,
 			Double minX,
@@ -60,6 +60,7 @@ public class MissionBrain
 	{
 		List<List<Point2D.Double>> listOfPointsLists = new ArrayList<>();
 		Point2D.Double endPointAtEdgeOfBoundary = new Point2D.Double(originalPointPath.x, originalPointPath.y);
+		List<GPSPosition> missionBoundaryPoints = missionBoundaryPath.positions;
 
 		//Save the Sine/Cosine values since we'll be using them often
 		Double cos = Math.cos(headingRadians);
@@ -141,6 +142,14 @@ public class MissionBrain
 					tracePathAlongMissionBoundaryFromOnePointToAnotherPointAddingVerticesOfTheShortestPath(
 							missionBoundaryPoints, endPointAtEdgeOfBoundary, newBeginPoint,
 							pointsFromOriginalPointToNewStartingPoint);
+					//we need to do an obstacle check between newBeginPoint and newEndPoint
+
+					circumventObstaclesBetweenTwoPointsAndAddTheGeneratedPointsToTheMission(
+							space,
+							pointsFromOriginalPointToNewStartingPoint,
+							space.gpsPositionGivenDistanceFromZeroZero(newBeginPoint.x, newBeginPoint.y),
+							space.gpsPositionGivenDistanceFromZeroZero(newEndPoint.x, newEndPoint.y),
+							polyObstaclesGPSPositionAreaList);
 					pointsFromOriginalPointToNewStartingPoint.add(new Point2D.Double(newEndPoint.x, newEndPoint.y));
 					//Now pointsFromOriginalPointToNewStartingPoint is a big beautiful
 					//List of points from the originalPointPath point that we called
@@ -956,10 +965,9 @@ public class MissionBrain
 
 	public void circumventObstaclesBetweenTwoPointsAndAddTheGeneratedPointsToTheMission(
 								GPSCartesianCoordinateSpace space,
-								List<GPSPosition> missionWaypoints,
+								List missionWaypoints,
 								GPSPosition startGPSPosition,
 								GPSPosition endGPSPosition,
-								Path2D.Double missionBoundary,
 								List<GPSPositionArea> polyObstaclesGPSPositionAreaList)
 	{
 		//Get a list of the obstacles intersected by the line formed
@@ -971,7 +979,7 @@ public class MissionBrain
 			//If we get here we know that the line formed by startGPSPosition
 			//and endGPSPosition intersects at least 1 obstacle
 			Point2D.Double normMeter = getParallelNorm(startGPSPosition, endGPSPosition, 1.0);
-			Point2D.Double normCM = getParallelNorm(startGPSPosition, endGPSPosition, 1.0);
+			Point2D.Double normCM = getParallelNorm(startGPSPosition, endGPSPosition, 0.01);
 
 			Double startToEndDistance = startGPSPosition.distance(endGPSPosition);
 
@@ -1160,6 +1168,7 @@ public class MissionBrain
 
 		Double headingRadians = Math.toRadians(headingDegrees);
         Path2D.Double missionBoundary = missionBoundary(missionBoundaryGPSPositionList);
+        GPSPositionArea missionBoundaryGPSPositionArea = new GPSPositionArea(missionBoundaryGPSPositionList);
 
 		adjustStartingPointIfFirstLineIsTooShort(startGPSPosition, missionBoundary, missionBoundaryGPSPositionList, headingRadians);
 		startGPSPosition = space.gpsPositionGivenDistanceFromZeroZero(startGPSPosition.x, startGPSPosition.y);
@@ -1208,8 +1217,9 @@ public class MissionBrain
 
 		//baswell begin new fancy look-beyond-boundary logic
 		List<List<Point2D.Double>> additionalPointsOnThisHeading = additionalValidMissionPointsOnTheGivenPointPathAndHeading(
-				missionBoundary,
-				missionBoundaryGPSPositionList,
+				space,
+				missionBoundaryGPSPositionArea,
+				polyObstaclesGPSPositionAreaList,
 				adjustedGuideGPS,
 				headingRadians,
 				minX,
@@ -1253,8 +1263,9 @@ public class MissionBrain
 				pushLineToBoundary(currentTopPoint, currentBottomPoint, normParallel, missionBoundary);
 
 				List<List<Point2D.Double>> additionalPoints = additionalValidMissionPointsOnTheGivenPointPathAndHeading(
-						missionBoundary,
-						missionBoundaryGPSPositionList,
+						space,
+						missionBoundaryGPSPositionArea,
+						polyObstaclesGPSPositionAreaList,
 						currentBottomPoint,
 						headingRadians+Math.PI,
 						minX,
@@ -1279,10 +1290,8 @@ public class MissionBrain
 				if(ADD_ANOTHER_PATH_LINE)
 				{
 					GPSPosition newTopGPS = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
-
 					missionWaypoints.add(newTopGPS);
 					System.out.println(i+"Top "+ newTopGPS.latitude + " " + newTopGPS.longitude + " Distance: " + geo.latLongDistance(lastTopGPS.latitude, lastTopGPS.longitude, newTopGPS.latitude, newTopGPS.longitude));
-
 					lastTopGPS = newTopGPS;
 					
 					if(Math.abs(currentTopPoint.distance(currentBottomPoint)) >= Config.minMowingLineDistanceMeters)
@@ -1293,11 +1302,10 @@ public class MissionBrain
 								missionWaypoints,
 								newTopGPS,
 								firstLineStopPoint,
-								missionBoundary,
 								polyObstaclesGPSPositionAreaList);
 						//baswell -- end Add check for obstacles between newTopGPS and firstLineStopPoint
-						missionWaypoints.add(firstLineStopPoint);
 
+						missionWaypoints.add(firstLineStopPoint);
 
 						if(flatPoints.size() > 0)
 						{
@@ -1338,8 +1346,9 @@ public class MissionBrain
 				pushLineToBoundary(currentBottomPoint, currentTopPoint, normParallelNegative, missionBoundary);
 
 				List<List<Point2D.Double>> additionalPoints = additionalValidMissionPointsOnTheGivenPointPathAndHeading(
-						missionBoundary,
-						missionBoundaryGPSPositionList,
+						space,
+						missionBoundaryGPSPositionArea,
+						polyObstaclesGPSPositionAreaList,
 						currentTopPoint,
 						headingRadians,
 						minX,
@@ -1370,7 +1379,14 @@ public class MissionBrain
 					
 					if(Math.abs(currentTopPoint.distance(currentBottomPoint)) >= Config.minMowingLineDistanceMeters)
 					{
-						GPSPosition newTopGPS = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
+						//baswell -- begin Add check for obstacles between newBottomGPS and firstLineStopPoint
+						circumventObstaclesBetweenTwoPointsAndAddTheGeneratedPointsToTheMission(
+								space,
+								missionWaypoints,
+								newBottomGPS,
+								firstLineStopPoint,
+								polyObstaclesGPSPositionAreaList);
+						//baswell -- end Add check for obstacles between newTopGPS and firstLineStopPoint
 
 						missionWaypoints.add(firstLineStopPoint);
 
@@ -1386,8 +1402,7 @@ public class MissionBrain
 						//point (i.e. currentTopPoint) -- so we want add the karateified point
 						//to the missionWaypoints list
 						missionWaypoints.add(space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y));
-
-						lastTopGPS = newTopGPS;
+						lastTopGPS = space.gpsPositionGivenDistanceFromZeroZero(currentTopPoint.x, currentTopPoint.y);
 					}
 					else
 					{
